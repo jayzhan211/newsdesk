@@ -211,6 +211,31 @@ input[type=text],input[type=url]{border:1.5px solid var(--line);border-radius:10
 .arrow{margin-left:4px;font-weight:700}.arrow.good{color:var(--good)}.arrow.bad{color:var(--bad)}
 .spark{width:220px;max-width:55%;height:44px}
 .weekly{border-left:4px solid var(--navy)}
+.paperslip{text-align:left;border-left:4px solid var(--gold)}
+.pz-h{font-family:var(--f-head);font-weight:700;font-size:19px;line-height:1.25;margin-top:4px}
+.paper{background:#f7f5ef;color:#1b1b1b;border:1px solid #d9d4c7;border-radius:6px;padding:16px 16px 18px;box-shadow:0 6px 20px rgba(0,0,0,.08);font-family:var(--f-head)}
+.mast{text-align:center;border-bottom:3px double #1b1b1b;padding-bottom:8px;margin-bottom:12px}
+.mast-top{display:flex;justify-content:space-between;gap:8px;font-family:var(--f-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#555;border-bottom:1px solid #1b1b1b;padding-bottom:4px;margin-bottom:6px;flex-wrap:wrap}
+.mast-name{font-family:var(--f-head);font-weight:700;font-size:clamp(26px,7vw,40px);letter-spacing:.01em;line-height:1.05}
+.pz-lead{position:relative;border-bottom:1px solid #1b1b1b;padding-bottom:12px;margin-bottom:12px}
+.pz-kicker{font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;color:#9a2b1f;text-transform:uppercase}
+.pz-h1{font-weight:700;font-size:clamp(22px,5.4vw,30px);line-height:1.12;margin:2px 0 8px;text-wrap:balance}
+.pz-h2{font-weight:700;font-size:17px;line-height:1.2;margin:2px 0 4px;text-wrap:balance}
+.pz-lede,.pz-item p{font-family:var(--f-read);font-size:14.5px;line-height:1.55;margin:0;color:#2a2a2a}
+.pz-grid{display:grid;grid-template-columns:1fr 150px;gap:14px}
+.pz-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px}
+.pz-item{position:relative;border-bottom:1px solid #cfc9bb;padding-bottom:10px}
+.pz-side{border-left:1px solid #1b1b1b;padding-left:12px;display:flex;flex-direction:column;gap:12px;font-family:var(--f-ui);font-size:13px}
+.pz-boxh{font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid #1b1b1b;margin-bottom:4px}
+.pz-empty{text-align:center;padding:30px 10px;color:#555;font-family:var(--f-ui);font-size:14px}
+.pz-note{color:#777;font-style:italic}
+.fixmark{position:absolute;top:0;right:0;font-family:var(--f-ui);font-size:10px;color:#b23535;border:1.5px solid #b23535;border-radius:4px;padding:0 5px;transform:rotate(4deg)}
+@media (max-width:560px){.pz-grid{grid-template-columns:1fr}.pz-cols{grid-template-columns:1fr}.pz-side{border-left:0;padding-left:0;border-top:1px solid #1b1b1b;padding-top:10px;flex-direction:row;flex-wrap:wrap}.pz-side .pz-box{flex:1 1 140px}}
+.pz-shelf{display:flex;flex-wrap:wrap;gap:8px}
+.pz-back{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:6px 10px;display:flex;flex-direction:column;align-items:center;font-size:12px;min-width:64px}
+.pz-back.on{border-color:var(--navy);background:var(--navy-soft)}
+nav.tabs button{font-size:13px}
+
 .diffline{margin:6px 0 2px}
 .jw.ext{align-items:flex-start;flex-wrap:wrap}.jw.ext a{text-decoration:none;color:inherit;flex:1 1 220px}
 
@@ -497,7 +522,7 @@ let V={view:"news"};
 function go(view,extra){V=Object.assign({view},extra||{});render();window.scrollTo({top:0});}
 function renderTabs(){
   const due=dueWords().length;
-  const tabs=[["news","編輯台"],["paste","自己貼"],["jar","單字罐"+(due?`<span class="dot">${due}</span>`:"")],["stats","進度"]];
+  const tabs=[["news","編輯台"],["paper","報紙"],["paste","自己貼"],["jar","單字罐"+(due?`<span class="dot">${due}</span>`:"")],["stats","進度"]];
   const cur={nprep:"news",nkeys:"news",desk:"news",read:"news",keys:"news",quiz:V.p&&V.p.paste?"paste":"news",result:V.p&&V.p.paste?"paste":"news",review:"jar",passport:"stats",backup:"stats",drill:"stats",pread:"paste",pkeys:"paste",pgist:"paste"}[V.view]||V.view;
   $("#tabs").innerHTML=tabs.map(([k,l])=>`<button data-act="tab" data-v="${k}" class="${cur===k?"on":""}">${l}</button>`).join("");
 }
@@ -518,7 +543,7 @@ function render(){
   renderTabs();
   saveWip();
   const pb=$("#previewBar");if(pb)pb.hidden=!PREVIEW;
-  const f={stats:vStats,drill:vDrill,desk:vDesk,news:vNews,nprep:vPrep,nkeys:vNKeys,read:vRead,keys:vKeys,quiz:vQuiz,result:vResult,passport:vPassport,backup:vBackup,jar:vJar,review:vReview,paste:vPaste,pread:vRead,pkeys:vKeys,pgist:vGist}[V.view]||vNews;
+  const f={paper:vPaper,stats:vStats,drill:vDrill,desk:vDesk,news:vNews,nprep:vPrep,nkeys:vNKeys,read:vRead,keys:vKeys,quiz:vQuiz,result:vResult,passport:vPassport,backup:vBackup,jar:vJar,review:vReview,paste:vPaste,pread:vRead,pkeys:vKeys,pgist:vGist}[V.view]||vNews;
   $("#app").innerHTML=f();
   document.body.classList.toggle("hints-off",!S.hints);
 }
@@ -549,7 +574,7 @@ function vNews(){
     <div class="stat"><b>${S.jar.length}</b><span>單字罐</span></div></div>`;
   const rk=rankOf(S.xp||0);
   h+=`<div class="card" style="margin-top:12px"><div class="row" style="justify-content:space-between"><div><div class="small muted">妳在編輯台的職位</div><div style="font-weight:700;font-size:18px">${rk.name}</div></div><div class="small muted" style="font-family:var(--f-mono)">${S.xp||0} XP${rk.next?` / ${rk.next}`:""}</div></div>${rk.next?`<div class="bar"><i style="width:${Math.min(100,Math.round(((S.xp||0)-rk.base)/(rk.next-rk.base)*100))}%"></i></div><div class="small muted">再 ${rk.next-(S.xp||0)} XP 升上「${RANKS[rk.i+1][1]}」</div>`:`<div class="small muted">已經是主編了！</div>`}</div>`;
-  h+=weeklyCardHTML()+weakCardHTML()+boardHTML()+inboxHTML();
+  h+=paperCardHTML()+weeklyCardHTML()+weakCardHTML()+boardHTML()+inboxHTML();
   if(due) h+=`<div class="card row" style="margin-top:12px;justify-content:space-between"><div><h3>單字罐裡有 ${due} 個字該複習了</h3><div class="small muted">隔幾天再見一次，最容易記住。</div></div><button class="btn" data-act="startReview">去複習</button></div>`;
   h+=`<p class="small muted" style="margin:14px 0 0">妳是英文報社的新人編輯。每天桌上的稿件都根據當天真實時事寫成，包含當天的頭條：讀稿、下標題、拆解長句、抓出混進去的錯、砍掉一段、回覆讀者來信。完成就升職、在護照蓋章；想讀原汁原味的新聞，最下面有延伸閱讀。題型仿考試閱讀測驗。目前推薦難度：<b>${LEVELS[S.rec].n}</b>（${LEVELS[S.rec].d}）</p>`;
   if(rec){h+=`<div class="sec-head"><h2>今天先處理這篇</h2></div><div class="cards">${newsCard(rec,true)}</div>`;}
@@ -679,7 +704,7 @@ function vKeys(){
 /* ---------- QUIZ ---------- */
 function vQuiz(){
   const p=V.p,qs=p.q,i=V.qi,q=qs[i],a=V.ans[i],L="ABCD";
-  const steps=p.desk?stepsHTML(DSTEPS,5):p.news?stepsHTML(NSTEPS,3):pSteps(2);
+  const steps=p.desk?stepsHTML(planOf().map(s=>DLABEL[s]),planOf().indexOf("mail")):p.news?stepsHTML(NSTEPS,3):pSteps(2);
   let h=`${steps}<div class="row" style="justify-content:space-between"><span class="chip red">${QTYPE[q.y]||"題目"}</span><span class="small muted">第 ${i+1} / ${qs.length} 題</span></div>${p.desk?`<div class="letter">✉️ 讀者來信</div>`:""}<div class="q-text">${esc(q.t)}</div>`;
   q.o.forEach((o,oi)=>{let c="opt";if(a!==undefined){if(oi===q.a)c+=" right";else if(oi===a)c+=" wrong";}
     h+=`<button class="${c}" data-act="answer" data-o="${oi}" ${a!==undefined?"disabled":""}><span class="L">${L[oi]}</span><span>${esc(o)}</span></button>`;});
@@ -690,24 +715,38 @@ function vQuiz(){
   return h;
 }
 /* ---------- DESK (editor tasks on original reports) ---------- */
-const DSTEPS=["讀稿","下標","拆句","抓錯","砍稿","來信"];
-function openDesk(p){V={view:"desk",p,stage:"read",d:{head:null,errPick:null,errHit:false,cut:null,ls:[null,null,null]},qi:0,ans:[],newWords:0,t0:Date.now()};render();window.scrollTo({top:0});}
+const DLABEL={read:"讀稿",head:"下標",ls:"拆句",err:"抓錯",cut:"砍稿",mail:"來信"};
+const TASK_ORDER=["head","ls","err","cut","mail"];
+function seededShuffle(arr,seed){let h=2166136261;for(const c of seed){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}const a=arr.slice();for(let i=a.length-1;i>0;i--){h^=h<<13;h^=h>>>17;h^=h<<5;const j=(h>>>0)%(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
+function makePlan(p){
+  const opts=["ls","err","cut","mail"].filter(t=>t!=="ls"||p.ls);
+  const w=weakest(),pref=w?{ls:"ls",logic:"err",key:"cut",detail:"mail",infer:"mail",vocab:"mail",intent:"mail"}[w.k]:null;
+  let pick=seededShuffle(opts,p.id+ME);
+  if(pref&&pick.includes(pref))pick=[pref].concat(pick.filter(x=>x!==pref));
+  pick=pick.slice(0,2);
+  return ["read"].concat(TASK_ORDER.filter(t=>t==="head"||pick.includes(t)));
+}
+function planOf(){return V.plan||(V.plan=["read","head"].concat(V.p.ls?["ls"]:[],["err","cut","mail"]));}
+function nextStage(){const pl=planOf(),i=pl.indexOf(V.view==="quiz"?"mail":V.stage);return pl[i+1];}
+function nextBtn(){const n=nextStage(),lab={head:"去下標題",ls:"下一個任務：拆解長句",err:"下一個任務：抓錯",cut:"下一個任務：砍稿",mail:"最後：回覆讀者來信"}[n]||"完成這篇，排進今天的報紙";
+  return `<button class="btn wide" data-act="dNext">${V.stage==="read"&&n==="head"?"讀完了，"+lab:lab} →</button>`;}
+function openDesk(p){V={view:"desk",plan:makePlan(p),p,stage:"read",d:{head:null,errPick:null,errHit:false,cut:null,ls:[null,null,null]},qi:0,ans:[],newWords:0,t0:Date.now()};render();window.scrollTo({top:0});}
 function deskParas(showWrong){const p=V.p;return p.paras.map((pa,pi)=>({s:pa.s.map((s,si)=>(showWrong&&pi===p.err.p&&si===p.err.s)?p.err.wrong:s),k:pa.k,a:pa.a,w:pa.w}));}
 function vDesk(){
   const p=V.p,D=V.d,st=V.stage,idx={read:0,head:1,ls:2,err:3,cut:4}[st];
-  let h=stepsHTML(DSTEPS,idx)+`<div class="row"><span class="chip">SLUG: ${esc(p.slug)}</span><span class="chip">${esc(p.topic)}</span><span class="chip red">${LEVELS[p.lv].n}</span><span class="small muted">📍 ${esc(p.place)}</span></div>`;
-  const view={...p,paras:deskParas(st!=="cut")};
+  let h=stepsHTML(planOf().map(s=>DLABEL[s]),planOf().indexOf(st))+`<div class="row"><span class="chip">SLUG: ${esc(p.slug)}</span><span class="chip">${esc(p.topic)}</span><span class="chip red">${LEVELS[p.lv].n}</span><span class="small muted">📍 ${esc(p.place)}</span></div>`;
+  const pl0=planOf(),view={...p,paras:deskParas(pl0.includes("err")&&pl0.indexOf(st)<=pl0.indexOf("err"))};
   if(st==="read"){
     h+=diffLine(p)+`<div class="memo"><b>主編留言：</b>這篇是今天的 ${esc(p.zh)}。先完整讀一遍，不懂的字點一下。等一下要妳下標題、檢查有沒有寫錯的地方，版面不夠還要砍一段。</div>
     <div class="row" style="justify-content:flex-end"><label class="toggle" for="hintT"><input type="checkbox" id="hintT" data-act="hints" ${S.hints?"checked":""}>虛線提示生字</label></div>
-    ${passageHTML(view,true)}<button class="btn wide" data-act="dNext" data-to="head">讀完了，去下標題 →</button>`;
+    ${passageHTML(view,true)}${nextBtn()}`;
   } else if(st==="head"){
     h+=`<h2 style="margin-top:0">幫這篇下標題</h2><p class="small muted">好標題要抓到整篇最重要的事，不能誇大，也不能寫文中沒有的內容。</p>`;
     p.heads.o.forEach((o,i)=>{let c="opt";if(D.head!==null){if(i===p.heads.a)c+=" right";else if(i===D.head)c+=" wrong";}h+=`<button class="${c} hd" data-act="dHead" data-i="${i}" ${D.head!==null?"disabled":""}><span class="L">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`;});
-    if(D.head!==null)h+=`<div class="explain"><b style="color:${D.head===p.heads.a?"var(--good)":"var(--bad)"}">${D.head===p.heads.a?"好標題！":"主編改用了 "+"ABCD"[p.heads.a]}</b>　${esc(p.heads.e)}</div><button class="btn wide" data-act="dNext" data-to="${p.ls?"ls":"err"}">下一個任務：${p.ls?"拆解長句":"抓錯"} →</button>`;
+    if(D.head!==null)h+=`<div class="explain"><b style="color:${D.head===p.heads.a?"var(--good)":"var(--bad)"}">${D.head===p.heads.a?"好標題！":"主編改用了 "+"ABCD"[p.heads.a]}</b>　${esc(p.heads.e)}</div>${nextBtn()}`;
     h+=`<details class="peek"><summary>回稿件看一下</summary>${passageHTML(view,false)}</details>`;
   } else if(st==="ls"){
-    h+=lsHTML(p,D.ls,"dLs")+(D.ls.every(x=>x!==null)?`<button class="btn wide" data-act="dNext" data-to="err">下一個任務：抓錯 →</button>`:"");
+    h+=lsHTML(p,D.ls,"dLs")+(D.ls.every(x=>x!==null)?`${nextBtn()}`:"");
   } else if(st==="err"){
     h+=`<h2 style="margin-top:0">稿子裡混進了一句錯誤</h2><p class="small muted">有一句的內容和文章其他地方互相矛盾。找出來點它。線索：數字、前後因果、轉折詞。</p>`;
     view.paras.forEach((pa,pi)=>{
@@ -716,14 +755,14 @@ function vDesk(){
         let c="sent";if(D.errPick){if(isErr)c+=" ok";else if(picked)c+=" no";}
         return `<span class="${c}" data-act="dErr" data-p="${pi}" data-s="${si}" role="button" tabindex="0">${esc(s)}</span>`;}).join(" ")+`</div>`;
     });
-    if(D.errPick)h+=`<div class="explain"><b style="color:${D.errHit?"var(--good)":"var(--bad)"}">${D.errHit?"抓到了！":"錯的是綠色那句"}</b>　${esc(p.err.e)}<div style="margin-top:6px"><b>正確應該是：</b><span style="font-family:var(--f-read)">${esc(p.paras[p.err.p].s[p.err.s])}</span></div></div><button class="btn wide" data-act="dNext" data-to="cut">下一個任務：砍稿 →</button>`;
+    if(D.errPick)h+=`<div class="explain"><b style="color:${D.errHit?"var(--good)":"var(--bad)"}">${D.errHit?"抓到了！":"錯的是綠色那句"}</b>　${esc(p.err.e)}<div style="margin-top:6px"><b>正確應該是：</b><span style="font-family:var(--f-read)">${esc(p.paras[p.err.p].s[p.err.s])}</span></div></div>${nextBtn()}`;
   } else if(st==="cut"){
     h+=`<h2 style="margin-top:0">版面不夠，要砍掉一段</h2><p class="small muted">選一段刪掉後，讀者「最不會漏掉重點」的段落。錯誤已經幫妳改好了。</p>`;
     p.paras.forEach((pa,pi)=>{
       let c="kp";if(D.cut!==null){if(pi===p.cut.p)c+=" ok";else if((p.cut.a||[]).includes(pi)&&pi===D.cut)c+=" miss";else if(pi===D.cut)c+=" no";}
       h+=`<button class="${c}" data-act="dCut" data-i="${pi}" ${D.cut!==null?"disabled":""}><span class="box">${pi+1}</span><span>${esc(pa.s.join(" "))}${D.cut!==null?`<span class="note">編輯筆記：重點句是「${esc(pa.s[pa.k])}」— ${esc(pa.w||"")}</span>`:""}</span></button>`;
     });
-    if(D.cut!==null){const ok=D.cut===p.cut.p,half=(p.cut.a||[]).includes(D.cut);h+=`<div class="explain"><b style="color:${ok?"var(--good)":half?"var(--warn)":"var(--bad)"}">${ok?"砍得好！":half?"也說得通，算對一半":"這段刪掉會漏重點"}</b>　${esc(p.cut.e)}</div>${sourcesHTML(p)}<button class="btn wide" data-act="dNext" data-to="mail">最後：回覆讀者來信 →</button>`;}
+    if(D.cut!==null){const ok=D.cut===p.cut.p,half=(p.cut.a||[]).includes(D.cut);h+=`<div class="explain"><b style="color:${ok?"var(--good)":half?"var(--warn)":"var(--bad)"}">${ok?"砍得好！":half?"也說得通，算對一半":"這段刪掉會漏重點"}</b>　${esc(p.cut.e)}</div>${sourcesHTML(p)}${nextBtn()}`;}
   }
   return h;
 }
@@ -747,10 +786,15 @@ function finishArticle(){
   const wpm=Math.round(wordsIn(p)/(secs/60));
   let res={wpm:secs>=20?wpm:null,newWords:V.newWords||0};
   if(p.desk){
-    const D=V.d, tasks=(D.head===p.heads.a?1:0)+(D.errHit?1:0)+(D.cut===p.cut.p?1:(p.cut.a||[]).includes(D.cut)?.5:0);
-    const qc=V.ans.filter((x,i)=>x===p.q[i].a).length;
-    const score=0.5*tasks/3+0.5*qc/p.q.length, stars=score>=.85?3:score>=.6?2:1;
-    Object.assign(res,{ks:tasks,kn:3,qc,qn:p.q.length,score,stars,tasksLabel:"編輯任務"});
+    const D=V.d,pl=planOf(),pts=[];let tasks=0,tn=0;
+    if(pl.includes("head")){const v=D.head===p.heads.a?1:0;pts.push(v);tasks+=v;tn++;}
+    if(pl.includes("ls")){const L=p.ls,qs=[L.subj,L.verb,L.mean],v=D.ls.filter((x,i)=>x===qs[i].a).length/3;pts.push(v);tasks+=v;tn++;}
+    if(pl.includes("err")){const v=D.errHit?1:0;pts.push(v);tasks+=v;tn++;}
+    if(pl.includes("cut")){const v=D.cut===p.cut.p?1:(p.cut.a||[]).includes(D.cut)?.5:0;pts.push(v);tasks+=v;tn++;}
+    let qc=0,qn=0;if(pl.includes("mail")){qn=p.q.length;qc=V.ans.filter((x,i)=>x===p.q[i].a).length;pts.push(qc/qn);}
+    const score=pts.reduce((x,y)=>x+y,0)/pts.length, stars=score>=.85?3:score>=.6?2:1;
+    Object.assign(res,{ks:Math.round(tasks*10)/10,kn:tn,qc,qn,score,stars,tasksLabel:"編輯任務"});
+    res.paper=addToPaper(p);
   }
   else if(p.q&&p.q.length){
     let kr=null,ks=null,kn=null;
@@ -768,7 +812,7 @@ function finishArticle(){
       if(!prev)res.stamp=makeStamp(p);
       const before=rankOf(S.xp||0).i;res.xp=Math.round(res.score*30)+(prev?0:10);S.xp=(S.xp||0)+res.xp;if(rankOf(S.xp).i>before)res.promo=rankOf(S.xp).name;
   }}
-  if(p.paste){res.stamp=makeStamp(p);res.xp=10;S.xp=(S.xp||0)+10;}
+  if(p.paste){res.paper=addToPaper(p);res.stamp=makeStamp(p);res.xp=10;S.xp=(S.xp||0)+10;}
   if(res.stamp)S.stamps.push(res.stamp);
   S.log.push({id:p.paste?"paste":p.id,title:p.title,zh:p.zh||"",topic:p.topic||"",date:t,wpm:res.wpm,score:res.score??null,stars:res.stars||0});
   save();V.res=res;V.view="result";render();window.scrollTo({top:0});
@@ -787,6 +831,8 @@ function vResult(){
   if(r.levelUp)h+=`<p class="chip">連續兩篇表現很好，推薦難度升到 ${LEVELS[S.rec].n}</p>`;
   if(r.levelDown)h+=`<p class="chip red">先回到 ${LEVELS[S.rec].n} 多練幾篇</p>`;
   h+=`</div>`;
+  if(p.desk&&p.sources)h+=`<div style="margin-top:12px;text-align:left">${sourcesHTML(p)}</div>`;
+  if(r.paper)h+=`<div class="card paperslip" style="margin-top:14px"><div class="small muted">已排進今天的《${esc(paperName())}》</div><div class="pz-h">${esc(r.paper.h)}</div>${r.paper.fixed?`<div class="small" style="color:var(--bad)">妳選的標題不夠準，主編改用了正確的版本</div>`:""}<button class="btn wide" style="margin-top:10px" data-act="paperOpen">看今天的報紙</button></div>`;
   if(r.stamp)h+=`<h2>護照蓋上新的章</h2><div class="visa" style="display:flex;align-items:center;gap:16px">${stampHTML(r.stamp,true)}<div class="small"><b>${esc(r.stamp.top)}</b><br><span class="muted">${esc(r.stamp.src||"")}</span><br>${esc(p.zh||p.title)}</div></div>`;
   else if(!p.paste)h+=`<p class="small muted" style="margin-top:12px">這篇之前讀過了，星星記錄最好的一次。讀新的一則才會蓋新章。</p>`;
   if(SY.on&&!p.paste){const liked=(S.likes||[]).some(l=>l.t===p.title);h+=`<div class="row" style="margin-top:14px;justify-content:center"><button class="btn ghost" data-act="like">${liked?"♥ 已標記喜歡":"♡ 我喜歡這類新聞"}</button><button class="btn ghost" data-act="recOpen" data-nid="${esc(p.id)}">推薦給${NM[PT]}</button></div>`;}
@@ -949,6 +995,9 @@ document.addEventListener("click",e=>{
     case "openNews": openNews(findP(d.id));break;
     case "openDesk": openDesk(findP(d.id));break;
     case "titleTap": titleTap();break;
+    case "paperOpen": go("paper",{pd:d.d||today()});break;
+    case "paperName": {const v=($("#pname")||{}).value||"";S.paperName=v.trim().slice(0,24)||"The Morning Desk";save();render();break;}
+    case "paperRename": S.paperName="";render();break;
     case "dLs": {const ok=lsAnswer(V.d.ls,V.p,+d.k,+d.o);save();render();break;}
     case "drillLs": {V.lsA=V.lsA||[null,null,null];const k=+d.k,before=V.lsA.every(x=>x!==null);const ok=lsAnswer(V.lsA,V.list[V.i].p,k,+d.o);if(k===2&&ok)V.right++;save();render();break;}
     case "wkSeen": S.wkSeen=monday(today());save();render();break;
@@ -966,7 +1015,9 @@ document.addEventListener("click",e=>{
     case "recSend": sendRec();break;
     case "recGo": openRecItem(d.id);break;
     case "recReact": reactRec(d.id,d.r);break;
-    case "dNext": if(d.to==="mail"){V.view="quiz";V.qi=0;V.ans=[];if(!V.tRead)V.tRead=null;}else{if(d.to==="head")V.tRead=(Date.now()-V.t0)/1000;V.stage=d.to;}render();window.scrollTo({top:0});break;
+    case "dNext": {const nx=nextStage();if(V.stage==="read")V.tRead=(Date.now()-V.t0)/1000;
+      if(!nx){finishArticle();break;}
+      if(nx==="mail"){V.view="quiz";V.qi=0;V.ans=[];}else V.stage=nx;render();window.scrollTo({top:0});break;}
     case "dHead": if(V.d.head!==null)return;V.d.head=+d.i;recSkill("main",V.d.head===V.p.heads.a);render();break;
     case "dErr": if(V.d.errPick)return;V.d.errPick=[+d.p,+d.s];V.d.errHit=(+d.p===V.p.err.p&&+d.s===V.p.err.s);recSkill("logic",V.d.errHit);render();break;
     case "dCut": if(V.d.cut!==null)return;V.d.cut=+d.i;recSkill("key",V.d.cut===V.p.cut.p||(V.p.cut.a||[]).includes(V.d.cut));render();break;
@@ -1038,6 +1089,42 @@ async function wipeMine(){
   location.reload();
 }
 function wipePreview(){try{localStorage.removeItem("desk-v1-preview");localStorage.setItem("desk_preview","1");}catch(e){}location.reload();}
+/* ---------- her own newspaper ---------- */
+function paperName(){return S.paperName||"The Morning Desk";}
+function addToPaper(p){
+  S.papers=S.papers||{};const t=today(),list=S.papers[t]=S.papers[t]||[];
+  if(list.some(x=>x.id===p.id))return list.find(x=>x.id===p.id);
+  let item;
+  if(p.desk){const fixed=V.d.head!==p.heads.a;item={id:p.id,h:p.heads.o[fixed?p.heads.a:V.d.head],fixed,zh:p.zh,topic:p.topic,place:p.place,lede:p.paras[0].s.join(" "),top:!!p.top};}
+  else item={id:p.id,h:p.title,zh:"",topic:"讀者推薦",place:hostOf(p.url)||"",lede:(p.paras[0]&&p.paras[0].s.slice(0,2).join(" "))||"",paste:true};
+  list.push(item);return item;
+}
+function paperDateLine(ds){return new Date(ds+"T00:00:00").toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});}
+function paperCardHTML(){
+  const n=((S.papers||{})[today()]||[]).length,total=Object.keys(S.papers||{}).length;if(!total)return "";
+  return `<div class="card row" style="margin-top:12px;justify-content:space-between"><div><div class="small muted">今天的《${esc(paperName())}》</div><b>${n?`已排 ${n} 篇`:"還是空白的"}</b><span class="small muted">　已出刊 ${total} 期</span></div><button class="btn ghost" data-act="paperOpen">翻報紙</button></div>`;
+}
+function vPaper(){
+  const P=S.papers||{},dates=Object.keys(P).sort().reverse();let ds=V.pd||today();
+  if(!P[ds]&&dates.length&&ds===today()&&!V.pd)ds=dates[0];
+  let h="";
+  if(!S.paperName)h+=`<div class="card" style="margin-bottom:12px"><b>幫妳的報紙取個名字</b><div class="small muted">每天處理過的稿件，會用妳選的標題排進這份報紙的頭版。</div><div class="row" style="margin-top:8px;flex-wrap:nowrap"><input type="text" id="pname" maxlength="24" placeholder="The Morning Desk"><button class="btn" data-act="paperName">命名</button></div></div>`;
+  const items=(P[ds]||[]).slice(),no=dates.length?dates.slice().reverse().indexOf(ds)+1:0;
+  const lead=items.find(x=>x.top&&!x.paste)||items.find(x=>!x.paste)||items[0],rest=items.filter(x=>x!==lead);
+  const todayAl=(S.al||[]).filter(x=>x.d===ds),acc=todayAl.length?Math.round(todayAl.filter(x=>x.ok).length/todayAl.length*100):null;
+  const words=S.jar.filter(w=>w.added===ds).slice(-6);
+  h+=`<div class="paper"><div class="mast"><div class="mast-top"><span>No. ${no||1}</span><span>${esc(paperDateLine(ds))}</span><span>主編：${NM[ME]}</span></div><div class="mast-name">${esc(paperName())}</div></div>`;
+  if(!items.length)h+=`<div class="pz-empty">今天的報紙還是空白的。<br>處理完第一篇稿件，它就會以妳下的標題登上頭版。</div>`;
+  else{
+    h+=`<div class="pz-lead">${lead.fixed?`<span class="fixmark">主編修訂</span>`:""}<div class="pz-kicker">${esc(lead.topic||"")}</div><div class="pz-h1">${esc(lead.h)}</div><p class="pz-lede"><b>${esc((lead.place||"").split(",")[0].toUpperCase())} —</b> ${esc(lead.lede)}</p></div>`;
+    h+=`<div class="pz-grid"><div class="pz-cols">${rest.map(x=>`<div class="pz-item">${x.fixed?`<span class="fixmark">主編修訂</span>`:""}<div class="pz-kicker">${esc(x.topic||"")}</div><div class="pz-h2">${esc(x.h)}</div><p>${esc(x.lede.length>220?x.lede.slice(0,220)+"…":x.lede)}</p></div>`).join("")||`<div class="pz-item"><p class="pz-note">版面還有空位，再處理一篇稿件就能填滿。</p></div>`}</div>
+    <aside class="pz-side"><div class="pz-box"><div class="pz-boxh">今日編輯台</div><div>處理稿件 ${items.length} 篇</div>${acc!==null?`<div>答對率 ${acc}%</div>`:""}</div>${words.length?`<div class="pz-box"><div class="pz-boxh">今日生字</div>${words.map(w=>`<div><b>${esc(w.w)}</b> ${esc(w.zh||"")}</div>`).join("")}</div>`:""}</aside></div>`;
+  }
+  h+=`</div>`;
+  if(dates.length)h+=`<h2>報紙架</h2><div class="pz-shelf">${dates.map(d=>`<button class="pz-back ${d===ds?"on":""}" data-act="paperOpen" data-d="${d}"><span>${d.slice(5).replace("-","/")}</span><b>${P[d].length} 篇</b></button>`).join("")}</div>`;
+  if(S.paperName)h+=`<p class="small muted" style="margin-top:12px"><button class="react" data-act="paperRename">改報紙名稱</button></p>`;
+  return h;
+}
 /* ---------- long-sentence breakdown ---------- */
 function lsHTML(p,ans,act){
   const L=p.ls,sent=p.paras[L.p].s[L.s],parts=[["這句的主詞（誰／什麼）是？",L.subj],["這句的主要動詞是？",L.verb],["整句的意思最接近？",L.mean]];
@@ -1208,7 +1295,7 @@ function drillKey(si){
 const PAIR="ZMw53o6D1c9zRUXYhSMyQmLU";
 const SY={on:false,db:null,partner:null,inbox:[],sent:[],timer:null,last:""};
 const REACTS={fun:"👍 有趣",hard:"🤯 好難",learn:"💡 學到了",meh:"😴 沒興趣"};
-function softRender(){if(["news","passport","paste","stats"].includes(V.view)&&!$("#layer").innerHTML)render();}
+function softRender(){if(["news","passport","paste","stats","paper"].includes(V.view)&&!$("#layer").innerHTML)render();}
 function clip(s,n){return String(s??"").slice(0,n);}
 function cleanProfile(d){if(!d||typeof d!=="object"||(+d.ts||0)<RESET_TS)return null;const n=(v,a,b)=>Math.max(a,Math.min(b,Math.floor(+v||0)));
   return {xp:n(d.xp,0,1e7),stk:n(d.stk,0,1e5),td:n(d.td,0,999),wk:n(d.wk,0,9999),n:n(d.n,0,1e6),stamps:n(d.stamps,0,1e6),countries:n(d.countries,0,999),words:n(d.words,0,1e6),
