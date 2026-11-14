@@ -235,6 +235,9 @@ input[type=text],input[type=url]{border:1.5px solid var(--line);border-radius:10
 .pz-back{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:6px 10px;display:flex;flex-direction:column;align-items:center;font-size:12px;min-width:64px}
 .pz-back.on{border-color:var(--navy);background:var(--navy-soft)}
 nav.tabs button{font-size:13px}
+.office-card{padding:10px}
+.office-wrap{border-radius:10px;overflow:hidden;line-height:0}
+.office{width:100%;height:auto;display:block}
 
 .diffline{margin:6px 0 2px}
 .jw.ext{align-items:flex-start;flex-wrap:wrap}.jw.ext a{text-decoration:none;color:inherit;flex:1 1 220px}
@@ -567,7 +570,7 @@ function newsCard(n,rec){
 }
 function vNews(){
   const due=dueWords().length, rec=recNews();
-  let h=`<div class="stats">
+  let h=officeCardHTML()+`<div class="stats" style="margin-top:12px">
     <div class="stat"><b>${streak()}</b><span>連續天數</span></div>
     <div class="stat"><b>${S.log.length}</b><span>讀過篇數</span></div>
     <div class="stat"><b>${new Set(S.stamps.filter(s=>s.country).map(s=>s.country)).size}</b><span>去過的國家</span></div>
@@ -814,7 +817,9 @@ function finishArticle(){
   }}
   if(p.paste){res.paper=addToPaper(p);res.stamp=makeStamp(p);res.xp=10;S.xp=(S.xp||0)+10;}
   if(res.stamp)S.stamps.push(res.stamp);
+  const before=S.log.length;
   S.log.push({id:p.paste?"paste":p.id,title:p.title,zh:p.zh||"",topic:p.topic||"",date:t,wpm:res.wpm,score:res.score??null,stars:res.stars||0});
+  const un=OFFICE.find(o=>o[0]===S.log.length&&before<o[0]);if(un)res.unlock=un;
   save();V.res=res;V.view="result";render();window.scrollTo({top:0});
 }
 function vResult(){
@@ -831,6 +836,7 @@ function vResult(){
   if(r.levelUp)h+=`<p class="chip">連續兩篇表現很好，推薦難度升到 ${LEVELS[S.rec].n}</p>`;
   if(r.levelDown)h+=`<p class="chip red">先回到 ${LEVELS[S.rec].n} 多練幾篇</p>`;
   h+=`</div>`;
+  if(r.unlock)h+=`<div class="card" style="margin-top:14px;text-align:left"><div class="small muted">編輯部多了新東西</div><b style="font-size:17px">${esc(r.unlock[1])}</b><div class="office-wrap" style="margin-top:8px">${officeSVG(S.log.length,true)}</div></div>`;
   if(p.desk&&p.sources)h+=`<div style="margin-top:12px;text-align:left">${sourcesHTML(p)}</div>`;
   if(r.paper)h+=`<div class="card paperslip" style="margin-top:14px"><div class="small muted">已排進今天的《${esc(paperName())}》</div><div class="pz-h">${esc(r.paper.h)}</div>${r.paper.fixed?`<div class="small" style="color:var(--bad)">妳選的標題不夠準，主編改用了正確的版本</div>`:""}<button class="btn wide" style="margin-top:10px" data-act="paperOpen">看今天的報紙</button></div>`;
   if(r.stamp)h+=`<h2>護照蓋上新的章</h2><div class="visa" style="display:flex;align-items:center;gap:16px">${stampHTML(r.stamp,true)}<div class="small"><b>${esc(r.stamp.top)}</b><br><span class="muted">${esc(r.stamp.src||"")}</span><br>${esc(p.zh||p.title)}</div></div>`;
@@ -1089,6 +1095,59 @@ async function wipeMine(){
   location.reload();
 }
 function wipePreview(){try{localStorage.removeItem("desk-v1-preview");localStorage.setItem("desk_preview","1");}catch(e){}location.reload();}
+
+/* ---------- the growing newsroom ---------- */
+const OFFICE=[[1,"檯燈","lamp"],[3,"盆栽","plant"],[5,"書架","shelf"],[8,"咖啡機","coffee"],[12,"報社的貓","cat"],[16,"牆上的第一期頭版","frame"],[20,"窗外的城市","city"],[30,"新的雙螢幕","monitors"],[40,"地毯和懶骨頭","rug"],[50,"金筆獎","trophy"]];
+function readCount(){return S.log.length;}
+function officeUnlocked(n){return new Set(OFFICE.filter(o=>n>=o[0]).map(o=>o[2]));}
+function nextOffice(n){return OFFICE.find(o=>n<o[0]);}
+function officeSVG(n,awake){
+  const has=officeUnlocked(n),hr=new Date().getHours(),night=hr>=18||hr<6,dusk=hr>=16&&hr<18;
+  const wall=night?"#2c3347":"#ece6d8",floor=night?"#5b4a3a":"#b99e7c",sky=night?"#1b2544":dusk?"#f2b38a":"#bfe2f3";
+  let s=`<svg viewBox="0 0 360 220" class="office" role="img" aria-label="編輯部">`;
+  s+=`<rect width="360" height="220" fill="${wall}"/><rect y="182" width="360" height="38" fill="${floor}"/><rect y="180" width="360" height="3" fill="rgba(0,0,0,.12)"/>`;
+  // window
+  s+=`<rect x="206" y="22" width="128" height="88" rx="3" fill="#6b5a48"/><rect x="211" y="27" width="118" height="78" fill="${sky}"/>`;
+  if(night)s+=[[225,38],[262,33],[300,45],[318,31],[244,52]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="1.2" fill="#fff" opacity=".8"/>`).join("")+`<circle cx="305" cy="44" r="7" fill="#f3efd6"/>`;
+  else s+=`<circle cx="300" cy="46" r="9" fill="${dusk?"#f7d27a":"#fff6c9"}"/><ellipse cx="238" cy="52" rx="14" ry="5" fill="#fff" opacity=".8"/>`;
+  if(has.has("city")){const b=[[211,70,16,35],[228,58,14,47],[243,74,18,31],[262,52,13,53],[276,66,20,39],[297,61,12,44],[310,76,19,29]];
+    s+=b.map(([x,y,w,h])=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${night?"#2d3b5e":"#8fa3b8"}"/>`+(night?Array.from({length:3},(_,i)=>`<rect x="${x+3+i*4}" y="${y+6+(i%2)*8}" width="2" height="3" fill="#ffd77a"/>`).join(""):"")).join("");}
+  s+=`<rect x="268" y="27" width="3" height="78" fill="#6b5a48"/><rect x="211" y="64" width="118" height="3" fill="#6b5a48"/>`;
+  // framed front page
+  if(has.has("frame"))s+=`<rect x="34" y="28" width="56" height="70" fill="#5a4636"/><rect x="38" y="32" width="48" height="62" fill="#f7f5ef"/><rect x="42" y="36" width="40" height="6" fill="#1b1b1b"/>${[48,53,58,63,68,73,78,83].map(y=>`<rect x="42" y="${y}" width="${y<60?40:18}" height="2" fill="#999"/>`).join("")}${[63,68,73,78,83].map(y=>`<rect x="64" y="${y}" width="18" height="2" fill="#999"/>`).join("")}`;
+  // rug
+  if(has.has("rug"))s+=`<ellipse cx="140" cy="203" rx="95" ry="11" fill="#b5523b" opacity=".85"/><ellipse cx="140" cy="203" rx="80" ry="7" fill="none" stroke="#e8c27a" stroke-width="1.5"/><path d="M300 200 q-26 0 -26 -14 q0 -14 26 -14 q26 0 26 14 q0 14 -26 14z" fill="#3f6f8f"/>`;
+  // shelf
+  if(has.has("shelf")){s+=`<rect x="286" y="116" width="62" height="66" fill="#7a5236"/><rect x="290" y="120" width="54" height="26" fill="#5c3c27"/><rect x="290" y="150" width="54" height="28" fill="#5c3c27"/>`;
+    const cols=["#c8402f","#2856a8","#2a7a57","#a8701a","#6a4a9e","#d9d4c7"];let x=292;for(let i=0;i<9;i++){const w=4+(i%3);s+=`<rect x="${x}" y="${123+(i%2)*2}" width="${w}" height="${21-(i%2)*2}" fill="${cols[i%6]}"/>`;x+=w+1;}
+    x=292;for(let i=0;i<7;i++){const w=5+(i%2);s+=`<rect x="${x}" y="${154+(i%3)}" width="${w}" height="${22-(i%3)}" fill="${cols[(i+2)%6]}"/>`;x+=w+1;}
+    if(has.has("trophy"))s+=`<path d="M312 104 h12 v4 q0 8 -6 9 q-6 -1 -6 -9z" fill="#e2b13c"/><rect x="315" y="117" width="6" height="3" fill="#e2b13c"/><rect x="312" y="113" width="12" height="3" fill="#c8962a"/>`;}
+  // desk
+  s+=`<rect x="24" y="140" width="236" height="9" rx="2" fill="#7a5236"/><rect x="32" y="149" width="7" height="33" fill="#5c3c27"/><rect x="246" y="149" width="7" height="33" fill="#5c3c27"/><rect x="150" y="149" width="70" height="26" fill="#6b4630"/><rect x="180" y="160" width="10" height="2" fill="#c9a54a"/>`;
+  // computer
+  if(has.has("monitors"))s+=`<rect x="92" y="96" width="50" height="34" rx="2" fill="#222"/><rect x="95" y="99" width="44" height="28" fill="${awake?"#7fb6d9":"#33445a"}"/><rect x="146" y="96" width="50" height="34" rx="2" fill="#222"/><rect x="149" y="99" width="44" height="28" fill="${awake?"#f2efe6":"#33445a"}"/>${awake?[103,108,113,118].map(y=>`<rect x="152" y="${y}" width="${y===103?30:38}" height="2" fill="#999"/>`).join(""):""}<rect x="139" y="130" width="10" height="10" fill="#333"/><rect x="128" y="138" width="34" height="3" fill="#333"/>`;
+  else s+=`<rect x="108" y="94" width="66" height="46" rx="5" fill="#d9d2c0"/><rect x="115" y="100" width="52" height="34" rx="3" fill="${awake?"#2f5a4a":"#26302c"}"/>${awake?`<rect x="120" y="106" width="26" height="2" fill="#8fe0b0"/><rect x="120" y="111" width="38" height="2" fill="#8fe0b0"/><rect x="120" y="116" width="32" height="2" fill="#8fe0b0"/>`:""}<rect x="132" y="134" width="18" height="6" fill="#bdb5a1"/>`;
+  s+=`<rect x="112" y="141" width="56" height="4" rx="1" fill="#555" opacity=".6"/>`;
+  // lamp
+  if(has.has("lamp")){if(night)s+=`<circle cx="62" cy="122" r="34" fill="#ffd77a" opacity=".18"/>`;s+=`<rect x="50" y="136" width="24" height="4" fill="#333"/><path d="M60 136 L68 110 L58 100" stroke="#333" stroke-width="3" fill="none"/><path d="M48 106 L66 92 L72 102z" fill="#c8402f"/>`;}
+  // plant
+  if(has.has("plant"))s+=`<path d="M228 140 h18 l-3 -16 h-12z" fill="#b5653f"/><path d="M237 124 q-14 -10 -10 -26 q8 8 10 26z" fill="#3f8f5a"/><path d="M237 124 q12 -14 6 -30 q-10 12 -6 30z" fill="#2f7a4a"/><path d="M237 124 q-4 -18 2 -22 q4 8 -2 22z" fill="#4fa36a"/>`;
+  // coffee
+  if(has.has("coffee"))s+=`<rect x="190" y="112" width="24" height="28" rx="3" fill="#3a3a3a"/><rect x="193" y="116" width="18" height="6" fill="#6b6b6b"/><rect x="197" y="129" width="10" height="9" rx="1" fill="#f2efe6"/>${awake?`<path d="M200 126 q-2 -4 1 -7 M204 126 q-2 -4 1 -7" stroke="#bbb" stroke-width="1.2" fill="none"/>`:""}`;
+  // cat
+  if(has.has("cat")){
+    if(awake)s+=`<g transform="translate(176 118)"><ellipse cx="0" cy="16" rx="11" ry="7" fill="#e39a4b"/><circle cx="0" cy="5" r="7" fill="#e39a4b"/><path d="M-6 0 l2 -7 l4 5z M6 0 l-2 -7 l-4 5z" fill="#e39a4b"/><circle cx="-2.5" cy="5" r="1" fill="#222"/><circle cx="2.5" cy="5" r="1" fill="#222"/><path d="M10 18 q8 -2 6 -10" stroke="#e39a4b" stroke-width="3" fill="none" stroke-linecap="round"/></g>`;
+    else s+=`<g transform="translate(72 132)"><ellipse cx="0" cy="4" rx="13" ry="6" fill="#e39a4b"/><circle cx="-9" cy="2" r="5" fill="#e39a4b"/><path d="M-13 -1 l1 -5 l3 4z M-6 -2 l0 -5 l-3 4z" fill="#e39a4b"/><path d="M-11 2 q1 1 2 0" stroke="#222" stroke-width=".8" fill="none"/><text x="4" y="-6" font-size="7" fill="${night?"#ccc":"#666"}">z</text><text x="9" y="-11" font-size="5" fill="${night?"#ccc":"#666"}">z</text></g>`;}
+  return s+`</svg>`;
+}
+function officeCardHTML(){
+  const n=readCount(),nx=nextOffice(n),awake=S.log.some(l=>l.date===today());
+  return `<div class="card office-card"><div class="office-wrap">${officeSVG(n,awake)}</div>
+  <div class="row" style="justify-content:space-between;margin-top:8px"><div class="small"><b>妳的編輯部</b><span class="muted">　已處理 ${n} 篇</span></div>
+  <div class="small muted">${nx?`再 ${nx[0]-n} 篇，會多一個「${nx[1]}」`:"編輯部已經完整了！"}</div></div>
+  ${OFFICE.some(o=>o[2]==="cat"&&n>=o[0])?`<div class="small muted" style="margin-top:2px">${awake?"貓今天醒著，陪妳一起看稿。":"貓還在睡，等妳今天的第一篇稿子。"}</div>`:""}</div>`;
+}
+
 /* ---------- her own newspaper ---------- */
 function paperName(){return S.paperName||"The Morning Desk";}
 function addToPaper(p){
