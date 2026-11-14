@@ -454,6 +454,8 @@ try{const raw=localStorage.getItem(KEY); if(raw){S=Object.assign(fresh(),JSON.pa
 function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 function save(){S.svt=Date.now();saveLocal();if(typeof scheduleSync==="function")scheduleSync();}
 if(S.rec>MAXLV)S.rec=MAXLV;
+PASSAGES.forEach(p=>{if(p.lv>MAXLV)p.lv=MAXLV;});
+(Array.isArray(window.NEWS)?window.NEWS:[]).forEach(n=>{if(n&&n.lv>MAXLV)n.lv=MAXLV;});
 const NEWS_LIST = (Array.isArray(window.NEWS)?window.NEWS:[]).filter(n=>n&&n.id&&((n.desk&&Array.isArray(n.paras)&&n.heads&&n.err&&n.cut&&Array.isArray(n.q))||(!n.desk&&n.url&&n.title))).map(n=>{if(n.desk){n.g=n.g||{};n.title=n.heads.o[n.heads.a];}else{n.ext=true;if(n.keys&&Array.isArray(n.q))n.news=true;}return n;}).sort((a,b)=>b.date.localeCompare(a.date));
 
 /* spread correct answers of practice passages across A–D, stable per question */
@@ -925,6 +927,7 @@ document.addEventListener("click",e=>{
     case "wkSeen": S.wkSeen=monday(today());save();render();break;
     case "setView": setView(d.v);break;
     case "wipePreview": wipePreview();break;
+    case "wipeMine": wipeMine();break;
     case "drill": startDrill(d.sk);break;
     case "drillAns": drillAnswer(+d.o);break;
     case "drillKey": drillKey(+d.s);break;
@@ -986,9 +989,25 @@ function titleTap(){const t=Date.now();tapN=t-tapT<700?tapN+1:1;tapT=t;if(tapN<5
   <p class="small muted">目前是：<b>${PREVIEW?"彣的視角（預覽）":"傑的視角"}</b>。兩個視角的進度各自保存，切來切去不會互相影響；彣的視角只是預覽，不會同步、也不會動到她真正的進度。</p>
   <div class="stack"><button class="btn ${PREVIEW?"ghost":""}" data-act="setView" data-v="j">傑的視角（我的編輯台）</button>
   <button class="btn ${PREVIEW?"":"ghost"}" data-act="setView" data-v="her">彣的視角（她看到的樣子）</button>
-  <button class="btn ghost" data-act="wipePreview">從頭再看一次她的開場（清空預覽進度）</button></div></div></div>`;
+  <button class="btn ghost" data-act="wipePreview">從頭再看一次她的開場（清空預覽進度）</button>
+  <button class="btn ghost" style="color:var(--bad);border-color:var(--bad)" data-act="wipeMine" id="wipeBtn">清空${PREVIEW?"預覽":"我（傑）"}的所有紀錄</button></div></div></div>`;
 }
 function setView(v){try{if(v==="her")localStorage.setItem("desk_preview","1");else localStorage.removeItem("desk_preview");}catch(e){}location.reload();}
+let wipeArm=0;
+async function wipeMine(){
+  const b=$("#wipeBtn");
+  if(Date.now()-wipeArm>4000){wipeArm=Date.now();if(b)b.textContent="再按一次確認清空（無法復原）";return;}
+  if(b)b.textContent="清空中…";
+  try{localStorage.removeItem(KEY);localStorage.removeItem(KEY+"_wip");}catch(e){}
+  if(!PREVIEW&&SY.on){
+    try{
+      const col=SY.db.collection(`pairs/${PAIR}/recs`);
+      for(const f of ["from","to"]){const q=await col.where(f,"==",ME).get();await Promise.all(q.docs.map(d=>d.ref.delete()));}
+      await SY.db.doc(`pairs/${PAIR}/desk/${ME}`).delete();
+    }catch(e){console.warn("wipe cloud",e);}
+  }
+  location.reload();
+}
 function wipePreview(){try{localStorage.removeItem("desk-v1-preview");localStorage.setItem("desk_preview","1");}catch(e){}location.reload();}
 /* ---------- long-sentence breakdown ---------- */
 function lsHTML(p,ans,act){
