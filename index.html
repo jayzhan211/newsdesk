@@ -211,6 +211,7 @@ input[type=text],input[type=url]{border:1.5px solid var(--line);border-radius:10
 .arrow{margin-left:4px;font-weight:700}.arrow.good{color:var(--good)}.arrow.bad{color:var(--bad)}
 .spark{width:220px;max-width:55%;height:44px}
 
+.previewbar{background:var(--accent);color:#fff;font-size:13px;text-align:center;border-radius:10px;padding:5px 10px;margin-bottom:8px}
 .bar{height:8px;border-radius:4px;background:var(--navy-soft);margin:8px 0 4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--navy);border-radius:4px}
 .memo{background:var(--warn-soft);border-left:4px solid var(--gold);border-radius:10px;padding:10px 12px;font-size:14px;margin:10px 0}
 .letter{font-size:13px;color:var(--accent);font-weight:700;margin-top:6px}
@@ -222,8 +223,9 @@ input[type=text],input[type=url]{border:1.5px solid var(--line);border-radius:10
 <div class="wrap">
   <header class="top">
     <div class="emblem" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="16" cy="16" r="12"/><ellipse cx="16" cy="16" rx="5.5" ry="12"/><path d="M4 16h24M6 10h20M6 22h20"/></svg></div>
-    <div class="brand"><h1>英文編輯台</h1><p>Today’s news, on your desk.</p></div>
+    <div class="brand"><h1 data-act="titleTap" style="cursor:default;user-select:none">英文編輯台</h1><p>Today’s news, on your desk.</p></div>
   </header>
+  <div id="previewBar" class="previewbar" hidden>預覽中：彣的視角（不會同步）</div>
   <nav class="tabs" id="tabs" aria-label="主選單"></nav>
   <main id="app"></main>
   <div class="foot">稿件根據真實時事原創撰寫並列出來源；外電全文請到原網站閱讀。題目與解析為本遊戲自行撰寫。</div>
@@ -426,8 +428,10 @@ const QTYPE = {main:"主旨",detail:"細節",vocab:"字義",infer:"推論",purpo
 "use strict";
 /* ---------- storage ---------- */
 const ROLE=(()=>{try{if(location.hash==="#j")localStorage.setItem("lb_role","j");return localStorage.getItem("lb_role")||"her";}catch(e){return "her";}})();
-const ME=ROLE==="j"?"j":"her", PT=ME==="j"?"her":"j", NM={j:"傑",her:"彣"};
-const KEY = "desk-v1-"+ME;
+/* preview: on J's device only, look at the game as she sees it, without touching her cloud data or the garden's role setting */
+const PREVIEW=(()=>{try{return ROLE==="j"&&localStorage.getItem("desk_preview")==="1";}catch(e){return false;}})();
+const ME=PREVIEW?"her":(ROLE==="j"?"j":"her"), PT=ME==="j"?"her":"j", NM={j:"傑",her:"彣"};
+const KEY = PREVIEW?"desk-v1-preview":"desk-v1-"+ME;
 const LEVELS = {1:{n:"Lv1 入門",d:"短新聞・B2"},2:{n:"Lv2 進階",d:"一般報導・C1"},3:{n:"Lv3 挑戰",d:"長篇分析・考試難度"}};
 const BOX_DAYS = [0,1,3,7,14];
 const INKS = ["--s1","--s2","--s3","--s4","--s5"];
@@ -482,6 +486,7 @@ function renderTabs(){
 }
 function render(){
   renderTabs();
+  const pb=$("#previewBar");if(pb)pb.hidden=!PREVIEW;
   const f={stats:vStats,drill:vDrill,desk:vDesk,news:vNews,nprep:vPrep,nkeys:vNKeys,read:vRead,keys:vKeys,quiz:vQuiz,result:vResult,passport:vPassport,backup:vBackup,jar:vJar,review:vReview,paste:vPaste,pread:vRead,pkeys:vKeys,pgist:vGist}[V.view]||vNews;
   $("#app").innerHTML=f();
   document.body.classList.toggle("hints-off",!S.hints);
@@ -881,6 +886,9 @@ document.addEventListener("click",e=>{
     case "tab": go(d.v);break;
     case "openNews": openNews(findP(d.id));break;
     case "openDesk": openDesk(findP(d.id));break;
+    case "titleTap": titleTap();break;
+    case "setView": setView(d.v);break;
+    case "wipePreview": wipePreview();break;
     case "drill": startDrill(d.sk);break;
     case "drillAns": drillAnswer(+d.o);break;
     case "drillKey": drillKey(+d.s);break;
@@ -933,6 +941,19 @@ document.addEventListener("keydown",e=>{
   if((e.key==="Enter"||e.key===" ")&&e.target.matches(".sent")){e.preventDefault();e.target.click();}
   if(e.key==="Escape")closeSheet();
 });
+/* ---------- hidden view switch: tap the title 5 times ---------- */
+let tapN=0,tapT=0;
+function titleTap(){const t=Date.now();tapN=t-tapT<700?tapN+1:1;tapT=t;if(tapN<5)return;tapN=0;
+  if(ROLE!=="j"){return;}
+  $("#layer").innerHTML=`<div class="scrim" data-act="closeSheet"><div class="sheet" role="dialog" aria-label="切換視角" data-stop="1">
+  <div class="row" style="justify-content:space-between"><b>切換視角</b><button class="xbtn" data-act="closeSheet" aria-label="關閉">✕</button></div>
+  <p class="small muted">目前是：<b>${PREVIEW?"彣的視角（預覽）":"傑的視角"}</b>。兩個視角的進度各自保存，切來切去不會互相影響；彣的視角只是預覽，不會同步、也不會動到她真正的進度。</p>
+  <div class="stack"><button class="btn ${PREVIEW?"ghost":""}" data-act="setView" data-v="j">傑的視角（我的編輯台）</button>
+  <button class="btn ${PREVIEW?"":"ghost"}" data-act="setView" data-v="her">彣的視角（她看到的樣子）</button>
+  <button class="btn ghost" data-act="wipePreview">從頭再看一次她的開場（清空預覽進度）</button></div></div></div>`;
+}
+function setView(v){try{if(v==="her")localStorage.setItem("desk_preview","1");else localStorage.removeItem("desk_preview");}catch(e){}location.reload();}
+function wipePreview(){try{localStorage.removeItem("desk-v1-preview");localStorage.setItem("desk_preview","1");}catch(e){}location.reload();}
 /* ---------- skill tracking & weakness analysis ---------- */
 const SK={
   main:{n:"主旨",d:"抓全文在講什麼、下標題",tip:"先看首段和末段，找全文反覆出現的概念。選項只講到某一段（太細）或超出文章範圍（太廣）都不對。"},
@@ -1077,9 +1098,10 @@ function myProfile(){
     sv:JSON.stringify(S),svt:S.svt||Date.now(),ts:Date.now()};
 }
 function scheduleSync(){if(!SY.on)return;clearTimeout(SY.timer);SY.timer=setTimeout(pushMine,2000);}
-async function pushMine(){if(!SY.on)return;clearTimeout(SY.timer);const p=myProfile(),k=p.sv+p.td+p.stk;if(k===SY.last)return;
+async function pushMine(){if(!SY.on||PREVIEW)return;clearTimeout(SY.timer);const p=myProfile(),k=p.sv+p.td+p.stk;if(k===SY.last)return;
   try{await SY.db.doc(`pairs/${PAIR}/desk/${ME}`).set(p);SY.last=k;}catch(e){console.warn("desk sync",e);}}
 async function restoreCloud(){
+  if(PREVIEW)return;
   try{const s=await SY.db.doc(`pairs/${PAIR}/desk/${ME}`).get({source:"server"});if(!s.exists)return;const d=s.data();if(!d||typeof d.sv!=="string")return;
     const c=JSON.parse(d.sv);if(!c||!Array.isArray(c.log))return;
     if((S.log.length===0&&c.log.length>0)||((+c.svt||0)>(S.svt||0)&&c.log.length>=S.log.length)){S=Object.assign(fresh(),c);saveLocal();if(S.log.length)toast("已從雲端找回進度");render();}
@@ -1141,14 +1163,15 @@ function openRecSheet(o){
   <button class="btn wide" data-act="recSend">送出</button></div></div>`;
 }
 async function sendRec(){
+  if(PREVIEW){closeSheet();toast("預覽模式不會真的送出");return;}
   const o=V.rec||{},n=o.nid?findP(o.nid):null,note=clip(($("#recNote")||{}).value||"",60).trim();
   const doc={from:ME,to:PT,url:n?(n.url||""):o.url||"",nid:n?n.id:"",title:clip(n?(n.desk?n.zh:n.title):o.title,200),note,ts:Date.now(),read:false,react:""};
   try{await SY.db.collection(`pairs/${PAIR}/recs`).add(doc);closeSheet();toast(`已推薦給${NM[PT]}`);}catch(e){toast("沒送出去，等一下再試");console.warn(e);}
 }
 function openRecItem(id){const r=SY.inbox.find(x=>x.id===id);if(!r)return;const n=r.nid?findP(r.nid):null;
-  SY.db.doc(`pairs/${PAIR}/recs/${id}`).update({read:true}).catch(()=>{});
+  if(!PREVIEW)SY.db.doc(`pairs/${PAIR}/recs/${id}`).update({read:true}).catch(()=>{});
   if(n){n.desk?openDesk(n):openNews(n);}else if(r.url){window.open(r.url,"_blank","noopener");}}
-function reactRec(id,r){SY.db.doc(`pairs/${PAIR}/recs/${id}`).update({read:true,react:r}).then(()=>toast("已回應")).catch(()=>toast("等一下再試"));}
+function reactRec(id,r){if(PREVIEW){toast("預覽模式不會真的送出");return;}SY.db.doc(`pairs/${PAIR}/recs/${id}`).update({read:true,react:r}).then(()=>toast("已回應")).catch(()=>toast("等一下再試"));}
 render();
 initSync();
 
