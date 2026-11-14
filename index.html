@@ -434,7 +434,10 @@ const ROLE=(()=>{try{if(location.hash==="#j")localStorage.setItem("lb_role","j")
 /* preview: on J's device only, look at the game as she sees it, without touching her cloud data or the garden's role setting */
 const PREVIEW=(()=>{try{return ROLE==="j"&&localStorage.getItem("desk_preview")==="1";}catch(e){return false;}})();
 const ME=PREVIEW?"her":(ROLE==="j"?"j":"her"), PT=ME==="j"?"her":"j", NM={j:"傑",her:"彣"};
-const KEY = PREVIEW?"desk-v1-preview":"desk-v1-"+ME;
+/* fresh start before handing over: everything saved before RESET_TS is ignored and cleaned up */
+const RESET_TS=Date.UTC(2026,10,14,7,45);
+try{Object.keys(localStorage).filter(k=>k.startsWith("desk-v1-")).forEach(k=>localStorage.removeItem(k));}catch(e){}
+const KEY = PREVIEW?"desk-v2-preview":"desk-v2-"+ME;
 const LEVELS = {1:{n:"Lv1 新聞",d:"≈ BBC News 一般報導"},2:{n:"Lv2 專題",d:"≈ BBC Future 深度專題"},3:{n:"Lv3 考試",d:"≈ 學術閱讀測驗"}};
 const MAXLV=2;
 function diffInfo(p){
@@ -1207,11 +1210,11 @@ const SY={on:false,db:null,partner:null,inbox:[],sent:[],timer:null,last:""};
 const REACTS={fun:"👍 有趣",hard:"🤯 好難",learn:"💡 學到了",meh:"😴 沒興趣"};
 function softRender(){if(["news","passport","paste","stats"].includes(V.view)&&!$("#layer").innerHTML)render();}
 function clip(s,n){return String(s??"").slice(0,n);}
-function cleanProfile(d){if(!d||typeof d!=="object")return null;const n=(v,a,b)=>Math.max(a,Math.min(b,Math.floor(+v||0)));
+function cleanProfile(d){if(!d||typeof d!=="object"||(+d.ts||0)<RESET_TS)return null;const n=(v,a,b)=>Math.max(a,Math.min(b,Math.floor(+v||0)));
   return {xp:n(d.xp,0,1e7),stk:n(d.stk,0,1e5),td:n(d.td,0,999),wk:n(d.wk,0,9999),n:n(d.n,0,1e6),stamps:n(d.stamps,0,1e6),countries:n(d.countries,0,999),words:n(d.words,0,1e6),
     recent:(Array.isArray(d.recent)?d.recent:[]).slice(0,6).map(r=>({t:clip(r&&r.t,120),z:clip(r&&r.z,40),tp:clip(r&&r.tp,20),d:clip(r&&r.d,10),st:n(r&&r.st,0,3)})),
     likes:(Array.isArray(d.likes)?d.likes:[]).slice(-12).map(l=>({t:clip(l&&l.t,120),tp:clip(l&&l.tp,20)})),top:(Array.isArray(d.top)?d.top:[]).slice(0,4).map(x=>clip(x,20)),ts:n(d.ts,0,9e15)};}
-function cleanRec(d){if(!d||(d.from!=="j"&&d.from!=="her"))return null;return {from:d.from,to:d.to,url:/^https?:\/\//.test(d.url||"")?clip(d.url,600):"",nid:clip(d.nid,80),title:clip(d.title,200),note:clip(d.note,120),ts:+d.ts||0,read:!!d.read,react:REACTS[d.react]?d.react:""};}
+function cleanRec(d){if(!d||(d.from!=="j"&&d.from!=="her")||(+d.ts||0)<RESET_TS)return null;return {from:d.from,to:d.to,url:/^https?:\/\//.test(d.url||"")?clip(d.url,600):"",nid:clip(d.nid,80),title:clip(d.title,200),note:clip(d.note,120),ts:+d.ts||0,read:!!d.read,react:REACTS[d.react]?d.react:""};}
 function myProfile(){
   const t=today(),wk0=addDays(t,-6),topics={};
   S.log.forEach(l=>{if(l.topic&&l.topic!=="自選")topics[l.topic]=(topics[l.topic]||0)+1;});
@@ -1231,6 +1234,14 @@ async function restoreCloud(){
     if((S.log.length===0&&c.log.length>0)||((+c.svt||0)>(S.svt||0)&&c.log.length>=S.log.length)){S=Object.assign(fresh(),c);saveLocal();if(S.log.length)toast("已從雲端找回進度");render();}
   }catch(e){console.warn("restore",e);}
 }
+async function cleanupOld(){
+  try{
+    const ref=SY.db.doc(`pairs/${PAIR}/desk/${ME}`),s=await ref.get({source:"server"});
+    if(s.exists&&(+(s.data()||{}).ts||0)<RESET_TS)await ref.delete();
+    const col=SY.db.collection(`pairs/${PAIR}/recs`);
+    for(const f of ["from","to"]){const q=await col.where(f,"==",ME).get();await Promise.all(q.docs.filter(d=>(+(d.data()||{}).ts||0)<RESET_TS).map(d=>d.ref.delete()));}
+  }catch(e){console.warn("cleanup",e);}
+}
 async function initSync(){
   if(!window.firebase||!window.__FB_CONFIG)return;
   try{
@@ -1238,6 +1249,7 @@ async function initSync(){
     await firebase.auth().signInAnonymously();SY.db=firebase.firestore();
     // check that the desk paths are allowed before turning the shared features on
     await SY.db.doc(`pairs/${PAIR}/desk/${PT}`).get();
+    if(!PREVIEW)await cleanupOld();
     await restoreCloud();SY.on=true;render();
     SY.db.doc(`pairs/${PAIR}/desk/${PT}`).onSnapshot(s=>{SY.partner=s.exists?cleanProfile(s.data()):null;softRender();},e=>console.warn("partner",e));
     const col=SY.db.collection(`pairs/${PAIR}/recs`);
