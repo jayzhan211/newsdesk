@@ -218,7 +218,7 @@ input[type=text],input[type=url]{border:1.5px solid var(--line);border-radius:10
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script>window.__FB_CONFIG={ apiKey: "AIzaSyCyjyTwemd7VuuaWL8IzKqzxbQvvidEcBg", authDomain: "word-garden-2a5cc.firebaseapp.com", projectId: "word-garden-2a5cc", storageBucket: "word-garden-2a5cc.firebasestorage.app", messagingSenderId: "50114694819", appId: "1:50114694819:web:e9119133c6770a8e1db916", measurementId: "G-SDM13WWPMG" };</script>
+<script>window.__FB_CONFIG={ apiKey: "AIzaSyB9jXqjTepIeZ5oxRRP__5beTG4dyanZTA", authDomain: "newsdesk-c1a19.firebaseapp.com", projectId: "newsdesk-c1a19", storageBucket: "newsdesk-c1a19.firebasestorage.app", messagingSenderId: "1059191143119", appId: "1:1059191143119:web:1a3644109a03f0b71c95ba" };</script>
 <script src="news.js"></script>
 <script>
 /* ===== Built-in practice passages: original articles written for this game ===== */
@@ -914,8 +914,8 @@ document.addEventListener("keydown",e=>{
   if((e.key==="Enter"||e.key===" ")&&e.target.matches(".sent")){e.preventDefault();e.target.click();}
   if(e.key==="Escape")closeSheet();
 });
-/* ---------- two-player sync (Firebase, shared with the garden) ---------- */
-const PAIR="HDzAwqJ7yVFqTTgJX3o1LMU3";
+/* ---------- two-player sync (Firebase) ---------- */
+const PAIR="ZMw53o6D1c9zRUXYhSMyQmLU";
 const SY={on:false,db:null,partner:null,inbox:[],sent:[],timer:null,last:""};
 const REACTS={fun:"👍 有趣",hard:"🤯 好難",learn:"💡 學到了",meh:"😴 沒興趣"};
 function softRender(){if(["news","passport","paste"].includes(V.view)&&!$("#layer").innerHTML)render();}
