@@ -196,6 +196,20 @@ input[type=text],input[type=url]{border:1.5px solid var(--line);border-radius:10
 .react{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:4px 10px;font-size:13px}
 .react:hover{border-color:var(--navy)}
 .chip.pt{background:var(--accent-soft);color:var(--accent)}
+.weak{border-left:4px solid var(--warn)}
+.tipbox{background:var(--warn-soft);border-radius:10px;padding:10px 12px;font-size:14px;margin-top:10px}
+.skills{display:flex;flex-direction:column;gap:8px}
+.skrow{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto auto;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+@media (max-width:480px){.skrow{grid-template-columns:1fr auto;}.skrow .skbar{order:3;align-self:center}.skrow .react{order:4;justify-self:end}}
+.skn{display:flex;flex-direction:column;min-width:0}
+.skbar{height:10px;border-radius:5px;background:var(--paper);overflow:hidden}
+.skbar i{display:block;height:100%;border-radius:5px}
+.skbar i.good{background:var(--good)}.skbar i.warn{background:var(--warn)}.skbar i.bad{background:var(--bad)}.skbar i.muted{background:var(--muted)}
+.skv{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tag{font-size:11px;padding:1px 7px;border-radius:999px}
+.tag.good{background:var(--good-soft);color:var(--good)}.tag.warn{background:var(--warn-soft);color:var(--warn)}.tag.bad{background:var(--bad-soft);color:var(--bad)}.tag.muted{background:var(--paper);color:var(--muted)}
+.arrow{margin-left:4px;font-weight:700}.arrow.good{color:var(--good)}.arrow.bad{color:var(--bad)}
+.spark{width:220px;max-width:55%;height:44px}
 
 .bar{height:8px;border-radius:4px;background:var(--navy-soft);margin:8px 0 4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--navy);border-radius:4px}
 .memo{background:var(--warn-soft);border-left:4px solid var(--gold);border-radius:10px;padding:10px 12px;font-size:14px;margin:10px 0}
@@ -462,13 +476,13 @@ let V={view:"news"};
 function go(view,extra){V=Object.assign({view},extra||{});render();window.scrollTo({top:0});}
 function renderTabs(){
   const due=dueWords().length;
-  const tabs=[["news","編輯台"],["paste","自己貼"],["jar","單字罐"+(due?`<span class="dot">${due}</span>`:"")],["passport","護照"]];
-  const cur={nprep:"news",nkeys:"news",desk:"news",read:"news",keys:"news",quiz:V.p&&V.p.paste?"paste":"news",result:V.p&&V.p.paste?"paste":"news",review:"jar",pread:"paste",pkeys:"paste",pgist:"paste",backup:"passport"}[V.view]||V.view;
+  const tabs=[["news","編輯台"],["paste","自己貼"],["jar","單字罐"+(due?`<span class="dot">${due}</span>`:"")],["stats","進度"]];
+  const cur={nprep:"news",nkeys:"news",desk:"news",read:"news",keys:"news",quiz:V.p&&V.p.paste?"paste":"news",result:V.p&&V.p.paste?"paste":"news",review:"jar",passport:"stats",backup:"stats",drill:"stats",pread:"paste",pkeys:"paste",pgist:"paste"}[V.view]||V.view;
   $("#tabs").innerHTML=tabs.map(([k,l])=>`<button data-act="tab" data-v="${k}" class="${cur===k?"on":""}">${l}</button>`).join("");
 }
 function render(){
   renderTabs();
-  const f={desk:vDesk,news:vNews,nprep:vPrep,nkeys:vNKeys,read:vRead,keys:vKeys,quiz:vQuiz,result:vResult,passport:vPassport,backup:vBackup,jar:vJar,review:vReview,paste:vPaste,pread:vRead,pkeys:vKeys,pgist:vGist}[V.view]||vNews;
+  const f={stats:vStats,drill:vDrill,desk:vDesk,news:vNews,nprep:vPrep,nkeys:vNKeys,read:vRead,keys:vKeys,quiz:vQuiz,result:vResult,passport:vPassport,backup:vBackup,jar:vJar,review:vReview,paste:vPaste,pread:vRead,pkeys:vKeys,pgist:vGist}[V.view]||vNews;
   $("#app").innerHTML=f();
   document.body.classList.toggle("hints-off",!S.hints);
 }
@@ -495,7 +509,7 @@ function vNews(){
     <div class="stat"><b>${S.jar.length}</b><span>單字罐</span></div></div>`;
   const rk=rankOf(S.xp||0);
   h+=`<div class="card" style="margin-top:12px"><div class="row" style="justify-content:space-between"><div><div class="small muted">妳在編輯台的職位</div><div style="font-weight:700;font-size:18px">${rk.name}</div></div><div class="small muted" style="font-family:var(--f-mono)">${S.xp||0} XP${rk.next?` / ${rk.next}`:""}</div></div>${rk.next?`<div class="bar"><i style="width:${Math.min(100,Math.round(((S.xp||0)-rk.base)/(rk.next-rk.base)*100))}%"></i></div><div class="small muted">再 ${rk.next-(S.xp||0)} XP 升上「${RANKS[rk.i+1][1]}」</div>`:`<div class="small muted">已經是主編了！</div>`}</div>`;
-  h+=boardHTML()+inboxHTML();
+  h+=weakCardHTML()+boardHTML()+inboxHTML();
   if(due) h+=`<div class="card row" style="margin-top:12px;justify-content:space-between"><div><h3>單字罐裡有 ${due} 個字該複習了</h3><div class="small muted">隔幾天再見一次，最容易記住。</div></div><button class="btn" data-act="startReview">去複習</button></div>`;
   h+=`<p class="small muted" style="margin:14px 0 0">妳是英文報社的新人編輯。每天桌上有兩種工作：<b>稿件</b>是根據當天真實時事寫成的報導，要讀稿、下標題、抓出混進去的錯、砍掉一段、回覆讀者來信；<b>外電</b>是真的新聞原文，到原網站讀完，回來挑重點、答題。完成就升職、在護照蓋章。題型仿考試閱讀測驗。目前推薦難度：<b>${LEVELS[S.rec].n}</b></p>`;
   if(rec){h+=`<div class="sec-head"><h2>今天先處理這篇</h2></div><div class="cards">${newsCard(rec,true)}</div>`;}
@@ -867,6 +881,11 @@ document.addEventListener("click",e=>{
     case "tab": go(d.v);break;
     case "openNews": openNews(findP(d.id));break;
     case "openDesk": openDesk(findP(d.id));break;
+    case "drill": startDrill(d.sk);break;
+    case "drillAns": drillAnswer(+d.o);break;
+    case "drillKey": drillKey(+d.s);break;
+    case "drillNext": V.i++;V.ans=null;render();window.scrollTo({top:0});break;
+    case "toPassport": go("passport");break;
     case "like": toggleLike(V.p);break;
     case "recOpen": openRecSheet({nid:d.nid||"",url:d.url||"",title:d.title||""});break;
     case "recFromPaste": {const u=$("#pUrl").value.trim();if(!/^https?:\/\//.test(u)){V.err="請先貼上以 http 開頭的連結。";render();break;}openRecSheet({url:u,title:$("#pTitle").value.trim()||hostOf(u)});break;}
@@ -874,24 +893,24 @@ document.addEventListener("click",e=>{
     case "recGo": openRecItem(d.id);break;
     case "recReact": reactRec(d.id,d.r);break;
     case "dNext": if(d.to==="mail"){V.view="quiz";V.qi=0;V.ans=[];if(!V.tRead)V.tRead=null;}else{if(d.to==="head")V.tRead=(Date.now()-V.t0)/1000;V.stage=d.to;}render();window.scrollTo({top:0});break;
-    case "dHead": V.d.head=+d.i;render();break;
-    case "dErr": if(V.d.errPick)return;V.d.errPick=[+d.p,+d.s];V.d.errHit=(+d.p===V.p.err.p&&+d.s===V.p.err.s);render();break;
-    case "dCut": V.d.cut=+d.i;render();break;
+    case "dHead": if(V.d.head!==null)return;V.d.head=+d.i;recSkill("main",V.d.head===V.p.heads.a);render();break;
+    case "dErr": if(V.d.errPick)return;V.d.errPick=[+d.p,+d.s];V.d.errHit=(+d.p===V.p.err.p&&+d.s===V.p.err.s);recSkill("logic",V.d.errHit);render();break;
+    case "dCut": if(V.d.cut!==null)return;V.d.cut=+d.i;recSkill("key",V.d.cut===V.p.cut.p||(V.p.cut.a||[]).includes(V.d.cut));render();break;
     case "openPractice": startArticle(findP(d.id));break;
     case "vocabAdd": if(jarPush(d.w,d.zh,"",V.p.title)){toast(`「${d.w}」放進單字罐了`);render();}else toast("已經在單字罐裡了");break;
     case "openSrc": V.opened=true;V.t0=Date.now();setTimeout(render,50);break;
     case "newsRead": V.tRead=V.opened?(Date.now()-V.t0)/1000:null;if(V.tRead!==null&&(V.tRead<30||V.tRead>3600))V.tRead=null;V.view="nkeys";render();window.scrollTo({top:0});break;
     case "kpick": {const i=+d.i,need=V.p.keys.k.length;if(V.picks.includes(i))V.picks=V.picks.filter(x=>x!==i);else if(V.picks.length<need)V.picks.push(i);else toast(`最多選 ${need} 句，先取消一句`);render();break;}
-    case "nCheck": V.checked=true;render();break;
+    case "nCheck": V.checked=true;V.picks.forEach(i=>recSkill("key",V.p.keys.k.includes(i)));save();render();break;
     case "hints": S.hints=el.checked;save();document.body.classList.toggle("hints-off",!S.hints);break;
     case "word": openWord(d.w,+d.p,+d.s);break;
     case "closeSheet": closeSheet();break;
     case "addWord": {let zh=d.zh;const my=$("#myZh");if(!zh&&my)zh=my.value.trim();jarPush(d.k,zh,V.p.paras[+d.p].s[+d.s],V.p.title);closeSheet();render();toast(`「${d.k}」放進單字罐了`);break;}
     case "doneRead": V.tRead=(Date.now()-V.t0)/1000;V.view=V.p.paste?"pkeys":"keys";render();window.scrollTo({top:0});break;
     case "pick": if(V.checked)return;V.picks[+d.p]=+d.s;render();break;
-    case "checkKeys": V.checked=true;render();break;
+    case "checkKeys": V.checked=true;V.p.paras.forEach((pa,i)=>recSkill("key",V.picks[i]===pa.k||(pa.a||[]).includes(V.picks[i])));save();render();break;
     case "toQuiz": V.view="quiz";V.qi=0;V.ans=[];render();window.scrollTo({top:0});break;
-    case "answer": V.ans[V.qi]=+d.o;render();break;
+    case "answer": {if(V.ans[V.qi]!==undefined)return;V.ans[V.qi]=+d.o;const q=V.p.q[V.qi],ok=+d.o===q.a;recSkill(Y2SK[q.y],ok);if(!V.p.paste)markWrong(V.p,V.qi,ok);render();break;}
     case "nextQ": if(V.qi+1<V.p.q.length){V.qi++;render();window.scrollTo({top:0});}else finishArticle();break;
     case "startReview": startReview(!!d.all);break;
     case "rvAns": V.ans=+d.o;grade(V.list[V.i],V.opts[V.ans]===V.list[V.i].zh);render();break;
@@ -914,11 +933,134 @@ document.addEventListener("keydown",e=>{
   if((e.key==="Enter"||e.key===" ")&&e.target.matches(".sent")){e.preventDefault();e.target.click();}
   if(e.key==="Escape")closeSheet();
 });
+/* ---------- skill tracking & weakness analysis ---------- */
+const SK={
+  main:{n:"主旨",d:"抓全文在講什麼、下標題",tip:"先看首段和末段，找全文反覆出現的概念。選項只講到某一段（太細）或超出文章範圍（太廣）都不對。"},
+  key:{n:"找重點",d:"分辨重點句和支持細節",tip:"主題句常在段首；However / Yet 之後、therefore / in other words 之後常是重點。例子、數字、引述通常是支持細節。"},
+  detail:{n:"細節",d:"找出文中明確寫到的資訊",tip:"用題目裡的關鍵字回原文定位，再逐字比對。特別注意數字、否定詞（not, never）和比較級。"},
+  infer:{n:"推論",d:"讀出文中沒直接寫的意思",tip:"正解一定能在文中找到依據，只是沒有直接寫出來。先刪掉「延伸太多」和「太絕對（always, only, never）」的選項。"},
+  vocab:{n:"字義",d:"從上下文猜單字意思",tip:"看前後的線索：同義改寫、對比（but, rather than）、解釋（i.e., —）。把選項代回句子讀一次，最通順的通常是答案。"},
+  intent:{n:"作者意圖",d:"作者的目的與態度",tip:"留意作者用的形容詞和轉折後的立場。題目問「為什麼提到某例子」時，答案通常是「支持前一句的論點」。"},
+  logic:{n:"邏輯檢查",d:"發現前後矛盾的句子",tip:"讀的時候順手記下數字、因果和立場，遇到跟前文對不上的地方就停下來比對。"}
+};
+const SK_ORDER=["main","key","detail","infer","vocab","intent","logic"];
+const Y2SK={main:"main",detail:"detail",ref:"detail",infer:"infer",apply:"infer",vocab:"vocab",purpose:"intent",attitude:"intent"};
+const MIN_N=5;
+function recSkill(sk,ok){
+  if(!SK[sk])return;S.sk=S.sk||{};const r=S.sk[sk]||(S.sk[sk]={n:0,ok:0,h:[]});
+  r.n++;if(ok)r.ok++;r.h.push(ok?1:0);if(r.h.length>40)r.h.shift();
+}
+function qid(p,i){return p.id+"#"+i;}
+function markWrong(p,i,ok){S.wrong=S.wrong||[];const k=qid(p,i);const at=S.wrong.indexOf(k);if(ok){if(at>=0)S.wrong.splice(at,1);}else if(at<0){S.wrong.push(k);if(S.wrong.length>200)S.wrong.shift();}}
+function skillStat(sk){
+  const r=(S.sk||{})[sk];if(!r||!r.n)return {n:0,acc:null,trend:0};
+  const h=r.h, last=h.slice(-10), prev=h.slice(-20,-10);
+  const acc=h.slice(-20).reduce((a,b)=>a+b,0)/Math.min(20,h.length);
+  const la=last.reduce((a,b)=>a+b,0)/last.length, pa=prev.length>=5?prev.reduce((a,b)=>a+b,0)/prev.length:null;
+  return {n:r.n,acc,trend:pa===null?0:la-pa};
+}
+function weakest(){
+  const c=SK_ORDER.filter(k=>k!=="logic").map(k=>({k,...skillStat(k)})).filter(x=>x.n>=MIN_N).sort((a,b)=>a.acc-b.acc);
+  return c.length&&c[0].acc<0.8?c[0]:null;
+}
+function levelTag(acc){return acc>=0.8?["強項","good"]:acc>=0.6?["普通","warn"]:["待加強","bad"];}
+function sparkline(vals){
+  if(vals.length<2)return "";const w=220,h=44,mx=Math.max(...vals),mn=Math.min(...vals),rg=Math.max(1,mx-mn);
+  const pts=vals.map((v,i)=>[i*(w/(vals.length-1)),h-4-(v-mn)/rg*(h-8)]);
+  return `<svg viewBox="0 0 ${w} ${h}" class="spark" aria-hidden="true"><polyline points="${pts.map(p=>p.join(",")).join(" ")}" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linejoin="round"/><circle cx="${pts[pts.length-1][0]}" cy="${pts[pts.length-1][1]}" r="3.5" fill="var(--accent)"/></svg>`;
+}
+function weakCardHTML(){
+  const w=weakest();if(!w)return "";
+  return `<div class="card weak" style="margin-top:12px"><div class="small muted">今天建議加強</div><div class="row" style="justify-content:space-between"><div><b style="font-size:17px">${SK[w.k].n}</b>　<span class="small muted">最近正確率 ${Math.round(w.acc*100)}%</span></div><button class="btn" data-act="drill" data-sk="${w.k}">針對練習</button></div></div>`;
+}
+function vStats(){
+  const tot=SK_ORDER.reduce((a,k)=>a+skillStat(k).n,0), w=weakest();
+  let h=`<h2 style="margin-top:0">我的弱點分析</h2>`;
+  if(tot<MIN_N)h+=`<div class="card small muted">再多做幾題，這裡就會開始分析妳在各題型的表現，並指出最需要加強的地方。</div>`;
+  if(w)h+=`<div class="card weak"><div class="small muted">目前最需要加強</div><div style="font-size:20px;font-weight:700;margin:2px 0">${SK[w.k].n}<span class="small muted" style="font-weight:400">　${SK[w.k].d}</span></div>
+    <div class="small">最近 ${Math.min(20,w.n)} 題答對 ${Math.round(w.acc*Math.min(20,w.n))} 題（${Math.round(w.acc*100)}%）</div>
+    <div class="tipbox"><b>技巧：</b>${SK[w.k].tip}</div><button class="btn wide" style="margin-top:10px" data-act="drill" data-sk="${w.k}">針對「${SK[w.k].n}」練習</button></div>`;
+  else if(tot>=MIN_N)h+=`<div class="card"><b>目前各題型都在 80% 以上</b><div class="small muted">很穩！可以試試更高難度的稿件。</div></div>`;
+  h+=`<h2>各題型表現</h2><div class="skills">`;
+  for(const k of SK_ORDER){
+    const s=skillStat(k);
+    if(!s.n){h+=`<div class="skrow"><div class="skn"><b>${SK[k].n}</b><span class="small muted">${SK[k].d}</span></div><div class="small muted">還沒做過</div></div>`;continue;}
+    const pct=Math.round(s.acc*100),tg=s.n>=MIN_N?levelTag(s.acc):["資料不足","muted"],arrow=s.trend>0.05?"↑":s.trend<-0.05?"↓":"";
+    h+=`<div class="skrow"><div class="skn"><b>${SK[k].n}</b><span class="small muted">${SK[k].d}</span></div>
+      <div class="skbar"><i class="${tg[1]}" style="width:${pct}%"></i></div>
+      <div class="skv"><b>${pct}%</b> <span class="tag ${tg[1]}">${tg[0]}</span>${arrow?`<span class="arrow ${arrow==="↑"?"good":"bad"}">${arrow}</span>`:""}<div class="small muted">${s.n} 題</div></div>
+      ${k!=="logic"&&s.n>=MIN_N?`<button class="react" data-act="drill" data-sk="${k}">練習</button>`:""}</div>`;
+  }
+  h+=`</div><p class="small muted">正確率以最近 20 題計算；箭頭比較最近 10 題和再前 10 題。</p>`;
+  const wl=(S.wrong||[]).length;
+  if(wl)h+=`<div class="card row" style="justify-content:space-between;margin-top:8px"><div><b>錯題本</b><div class="small muted">還有 ${wl} 題答錯過，答對就會移出。</div></div><button class="btn ghost" data-act="drill" data-sk="wrong">重做錯題</button></div>`;
+  h+=`<div class="row" style="margin-top:18px"><button class="btn ghost" data-act="toPassport">護照、閱讀紀錄與推薦</button></div>`;
+  const wp=S.log.map(l=>l.wpm).filter(x=>x&&x>30&&x<600).slice(-12);
+  if(wp.length>=2)h+=`<h2>閱讀速度</h2><div class="card row" style="justify-content:space-between"><div><div style="font-family:var(--f-mono);font-size:22px;font-weight:600">${wp[wp.length-1]} <span class="small muted">wpm</span></div><div class="small muted">最近 ${wp.length} 篇，平均 ${Math.round(wp.reduce((a,b)=>a+b,0)/wp.length)}</div></div>${sparkline(wp)}</div>`;
+  return h;
+}
+/* drill: questions of one skill from stories already read (text shown), wrong ones first */
+function drillBank(sk){
+  const items=[],pool=PASSAGES.concat(NEWS_LIST.filter(n=>n.desk));
+  const wrong=new Set(S.wrong||[]);
+  for(const p of pool){
+    if(!S.done[p.id])continue;
+    if(sk==="key"){p.paras.forEach((pa,pi)=>{if(typeof pa.k==="number"&&pa.s.length>1)items.push({t:"key",p,pi,w:0});});continue;}
+    p.q.forEach((q,i)=>{const k=qid(p,i);if(sk==="wrong"?wrong.has(k):(Y2SK[q.y]===sk||(sk==="main"&&q.y==="main")))items.push({t:"q",p,i,w:wrong.has(k)?1:0});});
+    if(sk==="main"&&p.heads)items.push({t:"head",p,w:0});
+  }
+  return shuffle(items).sort((a,b)=>b.w-a.w).slice(0,6);
+}
+function startDrill(sk){
+  const list=drillBank(sk);
+  if(!list.length){toast(sk==="wrong"?"錯題都清光了！":"先多讀幾篇稿件，才有題目可以練");return;}
+  V={view:"drill",sk,list,i:0,ans:null,right:0};render();window.scrollTo({top:0});
+}
+function vDrill(){
+  const D=V,title=D.sk==="wrong"?"錯題本":SK[D.sk].n+" 練習";
+  if(D.i>=D.list.length){
+    save();
+    return `<div class="card result"><h2>${title}完成</h2><p>答對 <b>${D.right}</b> / ${D.list.length}</p>${D.sk!=="wrong"?`<div class="tipbox" style="text-align:left"><b>記住這個技巧：</b>${SK[D.sk].tip}</div>`:""}<div class="stack" style="margin-top:12px"><button class="btn wide" data-act="tab" data-v="stats">回弱點分析</button><button class="btn ghost wide" data-act="tab" data-v="news">去編輯台</button></div></div>`;
+  }
+  const it=D.list[D.i],p=it.p,L="ABCD";
+  let h=`<div class="row" style="justify-content:space-between"><span class="chip red">${title}</span><span class="small muted">${D.i+1} / ${D.list.length}</span></div>
+  <div class="small muted" style="margin-top:6px">出自：${esc(p.desk?p.zh:p.title)}</div>`;
+  if(it.t==="key"){
+    const pa=p.paras[it.pi];
+    h+=`<h2 style="margin-top:8px">哪一句最能代表這段？</h2><div class="para-card ${D.ans!==null?"locked":""}">`+pa.s.map((s,si)=>{let c="sent";if(D.ans!==null){if(si===pa.k)c+=" ok";else if(si===D.ans&&(pa.a||[]).includes(si))c+=" half";else if(si===D.ans)c+=" no";}return `<span class="${c}" data-act="drillKey" data-s="${si}" role="button" tabindex="0">${esc(s)}</span>`;}).join(" ")+`</div>`;
+    if(D.ans!==null)h+=`<div class="explain">${esc(pa.w||"")}</div><button class="btn wide" data-act="drillNext">下一題 →</button>`;
+    return h;
+  }
+  if(it.t==="head"){
+    h+=`<h2 style="margin-top:8px">這篇的最佳標題是？</h2>`;
+    p.heads.o.forEach((o,oi)=>{let c="opt hd";if(D.ans!==null){if(oi===p.heads.a)c+=" right";else if(oi===D.ans)c+=" wrong";}h+=`<button class="${c}" data-act="drillAns" data-o="${oi}" ${D.ans!==null?"disabled":""}><span class="L">${L[oi]}</span><span>${esc(o)}</span></button>`;});
+    if(D.ans!==null)h+=`<div class="explain">${esc(p.heads.e)}</div><button class="btn wide" data-act="drillNext">下一題 →</button>`;
+    h+=`<details class="peek"><summary>看原文</summary>${passageHTML(p,false)}</details>`;
+    return h;
+  }
+  const q=p.q[it.i];
+  h+=`<div class="q-text">${esc(q.t)}</div>`;
+  q.o.forEach((o,oi)=>{let c="opt";if(D.ans!==null){if(oi===q.a)c+=" right";else if(oi===D.ans)c+=" wrong";}h+=`<button class="${c}" data-act="drillAns" data-o="${oi}" ${D.ans!==null?"disabled":""}><span class="L">${L[oi]}</span><span>${esc(o)}</span></button>`;});
+  if(D.ans!==null)h+=`<div class="explain"><b style="color:${D.ans===q.a?"var(--good)":"var(--bad)"}">${D.ans===q.a?"答對了":"正解是 "+L[q.a]}</b>　${esc(q.e||"")}</div><button class="btn wide" data-act="drillNext">下一題 →</button>`;
+  h+=`<details class="peek" ${D.ans===null?"open":""}><summary>原文</summary>${passageHTML(p,false)}</details>`;
+  return h;
+}
+function drillAnswer(o){
+  const D=V,it=D.list[D.i];if(D.ans!==null)return;D.ans=o;let ok;
+  if(it.t==="head"){ok=o===it.p.heads.a;recSkill("main",ok);}
+  else{const q=it.p.q[it.i];ok=o===q.a;recSkill(Y2SK[q.y],ok);markWrong(it.p,it.i,ok);}
+  if(ok)D.right++;render();
+}
+function drillKey(si){
+  const D=V,pa=D.list[D.i].p.paras[D.list[D.i].pi];if(D.ans!==null)return;D.ans=si;
+  const ok=si===pa.k||(pa.a||[]).includes(si);recSkill("key",ok);if(ok)D.right++;render();
+}
+
 /* ---------- two-player sync (Firebase) ---------- */
 const PAIR="ZMw53o6D1c9zRUXYhSMyQmLU";
 const SY={on:false,db:null,partner:null,inbox:[],sent:[],timer:null,last:""};
 const REACTS={fun:"👍 有趣",hard:"🤯 好難",learn:"💡 學到了",meh:"😴 沒興趣"};
-function softRender(){if(["news","passport","paste"].includes(V.view)&&!$("#layer").innerHTML)render();}
+function softRender(){if(["news","passport","paste","stats"].includes(V.view)&&!$("#layer").innerHTML)render();}
 function clip(s,n){return String(s??"").slice(0,n);}
 function cleanProfile(d){if(!d||typeof d!=="object")return null;const n=(v,a,b)=>Math.max(a,Math.min(b,Math.floor(+v||0)));
   return {xp:n(d.xp,0,1e7),stk:n(d.stk,0,1e5),td:n(d.td,0,999),wk:n(d.wk,0,9999),n:n(d.n,0,1e6),stamps:n(d.stamps,0,1e6),countries:n(d.countries,0,999),words:n(d.words,0,1e6),
