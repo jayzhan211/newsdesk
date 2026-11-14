@@ -46,7 +46,7 @@ window.NEWS = [
   {y:"detail",t:"Which of these was NOT mentioned as affected?",o:["Australia’s federal police","Japan’s government IT systems","The US House of Representatives","The British Parliament"],a:3,e:"文中提到澳洲警察、日本政府、美國眾議院，沒有英國國會。"},
   {y:"vocab",t:"In paragraph 4, “bumpy” most nearly means",o:["smooth and fast","full of problems and setbacks","very expensive","completely finished"],a:1,e:"bumpy 原意是路面顛簸，引申為過程不順。"}
  ]},
-{id:"o20261113-myanmar",desk:true,date:"2026-11-13",slug:"US-MYANMAR",zh:"美國為稀土接近緬甸軍政府",place:"Naypyidaw, Myanmar",topic:"國際・經濟",lv:3,
+{id:"o20261113-myanmar",desk:true,date:"2026-11-13",slug:"US-MYANMAR",zh:"美國為稀土接近緬甸軍政府",place:"Naypyidaw, Myanmar",topic:"國際・經濟",lv:2,
  ls:{p:2,s:2,subj:{o:["Washington","many mines","Analysts","armed groups"],a:2},verb:{o:["can build","lie","fighting","doubt"],a:3},mean:{o:["分析人士認為美國很快就能在克欽邦建立供應鏈。","美國懷疑分析人士能否打造替代供應鏈。","武裝團體正在替美國建立替代的供應鏈。","因此分析人士懷疑美國能否很快建立替代的供應鏈：許多礦場位於靠近中國邊境的克欽邦，在與軍方作戰的武裝團體控制的地區。"],a:3},e:"主幹是 Analysts doubt that…（分析人士懷疑…）。that 子句是懷疑的內容；冒號後面解釋原因；held by… 和 fighting… 都是修飾前面名詞的分詞片語。"},
   sources:[{name:"ABC News (Australia)",url:"https://www.abc.net.au/news/2026-11-13/trump-quest-for-rare-earths-brings-us-closer-to-myanmar-regime/107376926"}],
  paras:[
