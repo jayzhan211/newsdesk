@@ -858,14 +858,38 @@ function grade(w,ok){
 function vPaste(){
   let h=`<h2 style="margin-top:0">貼一篇妳有興趣的文章</h2>
   <p class="small muted">BBC 或任何英文文章都可以。貼上連結和內文：一樣點生字收進單字罐 → 每段抓一句重點 → 用一句話寫出全文在講什麼。${AI?"Claude 會幫妳對重點、看摘要，再出三題。":"這裡沒有標準答案，照提示自己檢查就好。"}讀完也會蓋一個章。</p>
-  <label class="small muted" for="pUrl">文章連結</label><input type="url" id="pUrl" placeholder="https://www.bbc.com/news/…" style="margin:4px 0 8px">
-  <label class="small muted" for="pTitle">標題（可空白）</label><input type="text" id="pTitle" style="margin:4px 0 8px">
-  <label class="small muted" for="pText">內文</label><textarea id="pText" rows="9" placeholder="把文章內文複製貼在這裡，段落之間換行即可。" style="margin-top:4px"></textarea>
+  <label class="small muted" for="pUrl">文章連結</label>
+  <div class="row" style="flex-wrap:nowrap;margin:4px 0 6px"><input type="url" id="pUrl" placeholder="https://www.bbc.com/news/…" value="${esc((V.draft||{}).url||"")}"><button class="btn" style="white-space:nowrap" data-act="fetchUrl" ${V.fetching?"disabled":""}>${V.fetching?'<span class="spinner"></span>抓取中':"抓內文"}</button></div>
+  <p class="small muted" style="margin:0 0 8px">貼上連結按「抓內文」，會自動把文章內容填進下面。抓不到的網站，再手動複製內文貼上。</p>
+  <label class="small muted" for="pTitle">標題（可空白）</label><input type="text" id="pTitle" value="${esc((V.draft||{}).title||"")}" style="margin:4px 0 8px">
+  <label class="small muted" for="pText">內文</label><textarea id="pText" rows="9" placeholder="把文章內文複製貼在這裡，段落之間換行即可。" style="margin-top:4px">${esc((V.draft||{}).text||"")}</textarea>
   <p class="small muted">建議一次貼 3–8 段。文章只存在妳自己的瀏覽器裡。</p>
   <button class="btn wide" data-act="pasteGo">開始讀</button>
   <button class="btn ghost wide" style="margin-top:8px" data-act="wishAdd">只有連結，先存進「想讀」</button>${SY.on?`<button class="btn ghost wide" style="margin-top:8px" data-act="recFromPaste">把這個連結推薦給${NM[PT]}</button>`:""}${V.err?`<p class="small" style="color:var(--bad)">${esc(V.err)}</p>`:""}`;
-  if(S.wish.length)h+=`<h2>想讀清單</h2><p class="small muted">有空時打開，把內文貼回上面就能開始。</p><div class="jar-list wishlist">${S.wish.slice().reverse().map(u=>`<div class="jw"><a class="wd" style="font-weight:400" href="${esc(u)}" target="_blank" rel="noopener">${esc(hostOf(u))}<br><span class="small muted">${esc(u.length>70?u.slice(0,70)+"…":u)}</span></a><button class="btn ghost" style="padding:6px 10px" data-act="wishUse" data-u="${esc(u)}">貼內文</button>${SY.on?`<button class="btn ghost" style="padding:6px 10px" data-act="recOpen" data-url="${esc(u)}" data-title="${esc(hostOf(u))}">推薦</button>`:""}<button class="xbtn" data-act="wishDel" data-u="${esc(u)}" aria-label="移除">×</button></div>`).join("")}</div>`;
+  if(S.wish.length)h+=`<h2>想讀清單</h2><p class="small muted">有空時打開，把內文貼回上面就能開始。</p><div class="jar-list wishlist">${S.wish.slice().reverse().map(u=>`<div class="jw"><a class="wd" style="font-weight:400" href="${esc(u)}" target="_blank" rel="noopener">${esc(hostOf(u))}<br><span class="small muted">${esc(u.length>70?u.slice(0,70)+"…":u)}</span></a><button class="btn ghost" style="padding:6px 10px" data-act="wishUse" data-u="${esc(u)}">開始讀</button>${SY.on?`<button class="btn ghost" style="padding:6px 10px" data-act="recOpen" data-url="${esc(u)}" data-title="${esc(hostOf(u))}">推薦</button>`:""}<button class="xbtn" data-act="wishDel" data-u="${esc(u)}" aria-label="移除">×</button></div>`).join("")}</div>`;
   return h;
+}
+/* fetch an article's text in her own browser through a public reader service (r.jina.ai); falls back to manual paste */
+function cleanReader(t){
+  let title=((t.match(/^Title:\s*(.+)$/m)||[])[1]||"").replace(/\s*[-|–]\s*BBC.*$/,"").trim();
+  let body=(t.split(/Markdown Content:\s*\n/)[1]||t)
+    .replace(/!\[[^\]]*\]\([^)]*\)/g,"").replace(/\[([^\]]*)\]\([^)]*\)/g,"$1").replace(/^#+\s*/gm,"").replace(/[*_`>]/g,"");
+  const lines=body.split(/\n+/).map(s=>s.trim()).filter(s=>s.split(/\s+/).length>=8&&/[.!?"”’)]$/.test(s)&&!/^(image|getty|copyright|related|share|watch|follow|read more|published|updated|sign up|subscribe)/i.test(s));
+  return {title,text:lines.slice(0,16).join("\n\n")};
+}
+async function fetchUrl(u){
+  const url=(u||($("#pUrl")||{}).value||"").trim();V.draft=Object.assign({title:"",text:""},V.draft||{},{url});
+  if(!/^https?:\/\//.test(url)){V.err="請先貼上以 http 開頭的連結。";render();return;}
+  V.fetching=true;V.err="";render();
+  try{
+    const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),25000);
+    const r=await fetch("https://r.jina.ai/"+url,{signal:ctl.signal});clearTimeout(tm);
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    const c=cleanReader(await r.text());
+    if(c.text.split(/\s+/).length<60)throw new Error("too short");
+    V.draft={url,title:c.title||V.draft.title,text:c.text};V.err="";toast("抓到了，確認一下內文再開始");
+  }catch(e){V.err="這個網站的內文抓不到（可能被擋或需要登入）。請打開文章，手動複製內文貼到下面。";}
+  V.fetching=false;render();
 }
 function splitSentences(t){return t.replace(/\s+/g," ").trim().split(/(?<=[.!?]["”’']?)\s+(?=["“‘']?[A-Z0-9])/).map(s=>s.trim()).filter(Boolean);}
 function pasteGo(){
@@ -966,8 +990,9 @@ document.addEventListener("click",e=>{
     case "rvNext": V.i++;V.ans=null;V.opts=null;render();break;
     case "delWord": S.jar=S.jar.filter(w=>w.w!==d.w);save();render();break;
     case "pasteGo": pasteGo();break;
+    case "fetchUrl": fetchUrl();break;
     case "wishAdd": {const u=$("#pUrl").value.trim();if(!/^https?:\/\//.test(u)){V.err="請先貼上以 http 開頭的連結。";render();break;}if(!S.wish.includes(u))S.wish.push(u);save();V.err="";render();toast("存進想讀清單了");break;}
-    case "wishUse": render();$("#pUrl").value=d.u;$("#pText").focus();window.scrollTo({top:0});break;
+    case "wishUse": V.draft={url:d.u,title:"",text:""};window.scrollTo({top:0});fetchUrl(d.u);break;
     case "wishDel": S.wish=S.wish.filter(u=>u!==d.u);save();render();break;
     case "pasteCheck": pasteCheck();break;
     case "toGist": V.view="pgist";render();window.scrollTo({top:0});break;
@@ -976,6 +1001,7 @@ document.addEventListener("click",e=>{
     case "restore": try{const o=JSON.parse(decodeURIComponent(escape(atob($("#rs").value.trim()))));if(!o||o.v!==1)throw 0;S=Object.assign(fresh(),o);save();toast("進度已還原");go("news");}catch(_){toast("備份碼看起來不完整，請再貼一次");}break;
   }
 });
+document.addEventListener("input",e=>{const m={pUrl:"url",pTitle:"title",pText:"text"}[e.target.id];if(m){V.draft=V.draft||{};V.draft[m]=e.target.value;}});
 document.addEventListener("keydown",e=>{
   if((e.key==="Enter"||e.key===" ")&&e.target.matches(".sent")){e.preventDefault();e.target.click();}
   if(e.key==="Escape")closeSheet();
