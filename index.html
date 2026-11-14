@@ -762,7 +762,7 @@ function vPassport(){
   h+=`</div>`;
   const recent=S.log.slice(-8).reverse();
   if(recent.length)h+=`<h2>最近讀的</h2><div class="jar-list">${recent.map(l=>`<div class="jw"><span class="wd" style="font-weight:400">${esc(l.title||"")}</span><span class="small muted">${l.date.slice(5)}${l.wpm?" ・ "+l.wpm+" wpm":""}</span></div>`).join("")}</div>`;
-  h+=sentHTML();
+  h+=sentRecsHTML();
   h+=`<div class="row" style="margin-top:22px"><button class="btn ghost" data-act="tab" data-v="backup">備份／還原進度</button></div>`;
   return h;
 }
@@ -1125,7 +1125,7 @@ function inboxHTML(){
     <div class="row" style="margin-top:8px"><button class="btn" style="padding:7px 12px" data-act="recGo" data-id="${r.id}">打開</button></div>
     <div class="row" style="margin-top:6px;gap:6px"><span class="small muted">回應：</span>${Object.entries(REACTS).map(([k,l])=>`<button class="react" data-act="recReact" data-id="${r.id}" data-r="${k}">${l}</button>`).join("")}</div></div>`;}).join("")}</div>`;
 }
-function sentHTML(){
+function sentRecsHTML(){
   if(!SY.on||!SY.sent.length)return "";
   return `<h2>${you()}推薦給${NM[PT]}的</h2><div class="jar-list">${SY.sent.slice(0,10).map(r=>{const n=r.nid?findP(r.nid):null;
     return `<div class="jw"><span class="wd" style="font-weight:400">${esc(n?(n.zh||n.title):r.title)}</span><span class="small ${r.react?"":"muted"}">${r.react?REACTS[r.react]:r.read?"已看":"還沒看"}</span></div>`;}).join("")}</div>
