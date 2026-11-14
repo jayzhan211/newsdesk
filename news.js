@@ -4,8 +4,9 @@
    Daily updates insert new entries right after the NEW marker (newest first). */
 window.NEWS = [
 /*NEW*/
-{id:"o20261114-measles",desk:true,date:"2026-11-14",slug:"MEASLES-US",zh:"美國麻疹死亡增加，聯邦與州吵統計",place:"Pennsylvania, USA",topic:"公衛・政治",lv:2,
- sources:[{name:"Al Jazeera",url:"https://www.aljazeera.com/news/2026/11/14/measles-associated-deaths-reach-10-in-us-after-two-more-deaths-reported"}],
+{id:"o20261114-measles",desk:true,top:true,date:"2026-11-14",slug:"MEASLES-US",zh:"美國麻疹死亡增加，聯邦與州吵統計",place:"Pennsylvania, USA",topic:"公衛・政治",lv:2,
+ ls:{p:1,s:1,subj:{o:["More than 5,400 cases","data compiled by the CDC","Johns Hopkins University","the 2,289 recorded in 2025"],a:0},verb:{o:["compiled","have been confirmed","recorded","according to"],a:1},mean:{o:["CDC 與約翰霍普金斯大學今年彙整了 5,400 份資料，比 2025 年多兩倍。","今年確診病例比 2025 年少，只有 2,289 例。","根據 CDC 與約翰霍普金斯大學彙整的資料，今年至今已確診超過 5,400 例，是 2025 年 2,289 例的兩倍多。","約翰霍普金斯大學確認了 2025 年的 5,400 例病例。"],a:2},e:"主幹是 More than 5,400 cases have been confirmed（超過 5,400 例被確診）。according to… 交代資料來源；compiled by… 修飾 data；最後 more than double… 是補充說明，跟前面的數字比較。"},
+  sources:[{name:"Al Jazeera",url:"https://www.aljazeera.com/news/2026/11/14/measles-associated-deaths-reach-10-in-us-after-two-more-deaths-reported"}],
  paras:[
   {s:["Two more people have died after catching measles in the United States, bringing the number of measles-associated deaths this year to 10.","Wisconsin reported the death of an infant, while Pennsylvania said its latest victim had not been vaccinated."],k:0,a:[],w:"導言第一句交代最新、最重要的事實：死亡數增加到 10。"},
   {s:["The figures underline how far the country has slipped since it declared measles eliminated in 2000.","More than 5,400 cases have been confirmed so far this year, according to data compiled by the Centers for Disease Control and Prevention (CDC) and Johns Hopkins University, more than double the 2,289 recorded in 2025.","Pennsylvania has been the hardest-hit state, with over 1,500 cases and seven deaths."],k:0,a:[],w:"段首用 underline 點出意義（疫情倒退），後面是數字佐證。"},
@@ -25,7 +26,8 @@ window.NEWS = [
   {y:"vocab",t:"A reader is confused by the word “tally” in paragraph 3. It is closest in meaning to",o:["count","rumour","warning","law"],a:0,e:"tally＝統計、計數。official national tally＝官方全國統計。"}
  ]},
 {id:"o20261113-microsoft",desk:true,date:"2026-11-13",slug:"MICROSOFT-OUTAGE",zh:"微軟全球大當機",place:"Australia",topic:"科技",lv:1,
- sources:[{name:"ABC News (Australia)",url:"https://www.abc.net.au/news/2026-11-13/microsoft-outlook-outage/107380958"}],
+ ls:{p:2,s:2,subj:{o:["a large number of servers","the rest of its system","it (Microsoft)","a process that handles secure connections"],a:2},verb:{o:["became","blamed","pushing","handles"],a:1},mean:{o:["大量伺服器指責微軟，讓系統其他部分負荷過重。","微軟反而把問題歸咎於大量伺服器無法使用，額外負荷壓到系統其他部分，直到處理安全連線的程序不堪負荷。","處理安全連線的程序故意把負荷推給其他伺服器。","微軟把額外的伺服器加進系統，解決了安全連線問題。"],a:1},e:"主詞 it 指微軟，主要動詞是 blamed（歸咎）。that became unavailable 是修飾 servers 的關係子句；pushing extra load… 是分詞構句，表示造成的結果；until… 是時間子句。"},
+  sources:[{name:"ABC News (Australia)",url:"https://www.abc.net.au/news/2026-11-13/microsoft-outlook-outage/107380958"}],
  paras:[
   {s:["Users around the world were locked out of their email on Friday after a major Microsoft outage hit Outlook, Teams and other online services.","The company said its services were gradually coming back, but the recovery was slow and uneven."],k:0,a:[],w:"導言：誰、發生什麼事、影響什麼服務。"},
   {s:["The disruption was felt far beyond office workers.","In Australia, shops that rely on email lost sales, some patients could not reach telehealth appointments, and a number of remote schools closed for the day.","Government agencies, including the country’s spy agency and federal police, were also affected."],k:0,a:[],w:"段首概括「影響很廣」，後面舉例。"},
@@ -45,7 +47,8 @@ window.NEWS = [
   {y:"vocab",t:"In paragraph 4, “bumpy” most nearly means",o:["smooth and fast","full of problems and setbacks","very expensive","completely finished"],a:1,e:"bumpy 原意是路面顛簸，引申為過程不順。"}
  ]},
 {id:"o20261113-myanmar",desk:true,date:"2026-11-13",slug:"US-MYANMAR",zh:"美國為稀土接近緬甸軍政府",place:"Naypyidaw, Myanmar",topic:"國際・經濟",lv:3,
- sources:[{name:"ABC News (Australia)",url:"https://www.abc.net.au/news/2026-11-13/trump-quest-for-rare-earths-brings-us-closer-to-myanmar-regime/107376926"}],
+ ls:{p:2,s:2,subj:{o:["Washington","many mines","Analysts","armed groups"],a:2},verb:{o:["can build","lie","fighting","doubt"],a:3},mean:{o:["分析人士認為美國很快就能在克欽邦建立供應鏈。","美國懷疑分析人士能否打造替代供應鏈。","武裝團體正在替美國建立替代的供應鏈。","因此分析人士懷疑美國能否很快建立替代的供應鏈：許多礦場位於靠近中國邊境的克欽邦，在與軍方作戰的武裝團體控制的地區。"],a:3},e:"主幹是 Analysts doubt that…（分析人士懷疑…）。that 子句是懷疑的內容；冒號後面解釋原因；held by… 和 fighting… 都是修飾前面名詞的分詞片語。"},
+  sources:[{name:"ABC News (Australia)",url:"https://www.abc.net.au/news/2026-11-13/trump-quest-for-rare-earths-brings-us-closer-to-myanmar-regime/107376926"}],
  paras:[
   {s:["The United States has quietly reopened talks with Myanmar’s military-led government, a regime Washington has accused of genocide, in a shift driven partly by its search for rare earth minerals.","Senior US officials have met the country’s coup leader turned president, Min Aung Hlaing, in Tokyo and in the capital, Naypyidaw, this year."],k:0,a:[],w:"導言一句就包含事件（重啟會談）、對象（被控種族滅絕的政權）和動機（稀土）。"},
   {s:["The contacts mark a striking reversal.","After the military seized power in a 2021 coup, Washington imposed sanctions on its leaders and downgraded relations.","Now, officials hope to counter China’s influence in the region and secure access to Myanmar’s mineral wealth."],k:0,a:[2],w:"段首定調（大轉彎），後面用「過去 vs 現在」說明。"},

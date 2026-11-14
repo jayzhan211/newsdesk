@@ -210,6 +210,8 @@ input[type=text],input[type=url]{border:1.5px solid var(--line);border-radius:10
 .tag.good{background:var(--good-soft);color:var(--good)}.tag.warn{background:var(--warn-soft);color:var(--warn)}.tag.bad{background:var(--bad-soft);color:var(--bad)}.tag.muted{background:var(--paper);color:var(--muted)}
 .arrow{margin-left:4px;font-weight:700}.arrow.good{color:var(--good)}.arrow.bad{color:var(--bad)}
 .spark{width:220px;max-width:55%;height:44px}
+.weekly{border-left:4px solid var(--navy)}
+.jw.ext{align-items:flex-start;flex-wrap:wrap}.jw.ext a{text-decoration:none;color:inherit;flex:1 1 220px}
 
 .previewbar{background:var(--accent);color:#fff;font-size:13px;text-align:center;border-radius:10px;padding:5px 10px;margin-bottom:8px}
 .bar{height:8px;border-radius:4px;background:var(--navy-soft);margin:8px 0 4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--navy);border-radius:4px}
@@ -442,7 +444,7 @@ let S = fresh();
 try{const raw=localStorage.getItem(KEY); if(raw){S=Object.assign(fresh(),JSON.parse(raw));}}catch(e){}
 function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 function save(){S.svt=Date.now();saveLocal();if(typeof scheduleSync==="function")scheduleSync();}
-const NEWS_LIST = (Array.isArray(window.NEWS)?window.NEWS:[]).filter(n=>n&&n.id&&Array.isArray(n.q)&&((n.url&&n.keys)||(n.desk&&Array.isArray(n.paras)&&n.heads&&n.err&&n.cut))).map(n=>{if(n.desk){n.g=n.g||{};n.title=n.heads.o[n.heads.a];}else n.news=true;return n;}).sort((a,b)=>b.date.localeCompare(a.date));
+const NEWS_LIST = (Array.isArray(window.NEWS)?window.NEWS:[]).filter(n=>n&&n.id&&((n.desk&&Array.isArray(n.paras)&&n.heads&&n.err&&n.cut&&Array.isArray(n.q))||(!n.desk&&n.url&&n.title))).map(n=>{if(n.desk){n.g=n.g||{};n.title=n.heads.o[n.heads.a];}else{n.ext=true;if(n.keys&&Array.isArray(n.q))n.news=true;}return n;}).sort((a,b)=>b.date.localeCompare(a.date));
 
 /* spread correct answers of practice passages across A–D, stable per question */
 (function(){function rng(seed){let h=2166136261;for(const c of seed){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return()=>{h^=h<<13;h^=h>>>17;h^=h<<5;return((h>>>0)%10000)/10000;};}
@@ -484,8 +486,22 @@ function renderTabs(){
   const cur={nprep:"news",nkeys:"news",desk:"news",read:"news",keys:"news",quiz:V.p&&V.p.paste?"paste":"news",result:V.p&&V.p.paste?"paste":"news",review:"jar",passport:"stats",backup:"stats",drill:"stats",pread:"paste",pkeys:"paste",pgist:"paste"}[V.view]||V.view;
   $("#tabs").innerHTML=tabs.map(([k,l])=>`<button data-act="tab" data-v="${k}" class="${cur===k?"on":""}">${l}</button>`).join("");
 }
+const WIP_VIEWS=["desk","nprep","nkeys","read","keys","quiz","pread","pkeys","pgist"];
+function saveWip(){
+  try{
+    if(WIP_VIEWS.includes(V.view)&&V.p){const snap=Object.assign({},V,{p:V.p.paste?V.p:{id:V.p.id}});localStorage.setItem(KEY+"_wip",JSON.stringify({t:Date.now(),v:snap}));}
+    else localStorage.removeItem(KEY+"_wip");
+  }catch(e){}
+}
+function restoreWip(){
+  try{const w=JSON.parse(localStorage.getItem(KEY+"_wip")||"null");if(!w||Date.now()-w.t>12*3600e3)return;
+    const v=w.v,p=v.p&&v.p.paste?v.p:findP(v.p&&v.p.id);if(!p)return;v.p=p;V=v;
+    setTimeout(()=>toast("接著上次的進度"),300);
+  }catch(e){}
+}
 function render(){
   renderTabs();
+  saveWip();
   const pb=$("#previewBar");if(pb)pb.hidden=!PREVIEW;
   const f={stats:vStats,drill:vDrill,desk:vDesk,news:vNews,nprep:vPrep,nkeys:vNKeys,read:vRead,keys:vKeys,quiz:vQuiz,result:vResult,passport:vPassport,backup:vBackup,jar:vJar,review:vReview,paste:vPaste,pread:vRead,pkeys:vKeys,pgist:vGist}[V.view]||vNews;
   $("#app").innerHTML=f();
@@ -494,15 +510,19 @@ function render(){
 
 /* ---------- NEWS HOME ---------- */
 function recNews(){
-  const unread=NEWS_LIST.filter(n=>!S.done[n.id]);
-  return unread.find(n=>n.lv===S.rec)||unread[0]||null;
+  const unread=NEWS_LIST.filter(n=>n.desk&&!S.done[n.id]);
+  return unread.find(n=>n.top&&n.date>=addDays(today(),-1))||unread.find(n=>n.lv===S.rec)||unread[0]||null;
+}
+function extHTML(){
+  const ex=NEWS_LIST.filter(n=>n.ext).slice(0,12);if(!ex.length)return "";
+  return `<div class="sec-head"><h2>延伸閱讀</h2><span class="small muted">真的新聞原文，想讀再點</span></div><div class="jar-list">${ex.map(n=>`<div class="jw ext"><a class="wd" style="font-weight:400" href="${esc(n.url)}" target="_blank" rel="noopener"><span class="small muted">${esc(n.src)} · ${esc(n.date.slice(5).replace("-","/"))} · ${esc(n.topic||"")}</span><br><span style="font-family:var(--f-head);font-weight:600">${esc(n.title)}</span><br><span class="small muted">${esc(n.zh||"")}</span></a>${n.news?`<button class="react" data-act="openNews" data-id="${esc(n.id)}">${S.done[n.id]?"已答題":"讀完來答題"}</button>`:""}${SY.on?`<button class="react" data-act="recOpen" data-url="${esc(n.url)}" data-title="${esc(n.title)}">推薦</button>`:""}</div>`).join("")}</div>`;
 }
 function newsCard(n,rec){
   const d=S.done[n.id];
   return `<button class="ncard ${rec?"rec":""} ${d?"done":""}" data-act="${n.desk?"openDesk":"openNews"}" data-id="${esc(n.id)}">
     <span class="main"><span class="src">${n.desk?"稿件 · SLUG: "+esc(n.slug||""):"外電 · "+esc(n.src)} · ${esc(n.date.slice(5).replace("-","/"))}</span>
     <span class="hl">${n.desk&&!d?esc(n.zh):esc(n.title)}</span><span class="zh">${n.desk?(d?esc(n.zh):"標題待妳來下"):esc(n.zh||"")}</span>
-    <span class="meta-row"><span class="chip">${esc(n.topic)}</span><span class="chip red">${LEVELS[n.lv].n}</span>${d?starsHTML(d.best):""}${partnerRead(n)?`<span class="chip pt">${NM[PT]}讀過</span>`:""}</span></span>
+    <span class="meta-row">${n.top?`<span class="chip red">今日頭條</span>`:""}<span class="chip">${esc(n.topic)}</span><span class="chip red">${LEVELS[n.lv].n}</span>${d?starsHTML(d.best):""}${partnerRead(n)?`<span class="chip pt">${NM[PT]}讀過</span>`:""}</span></span>
     <span class="stub"><span>${esc((n.place||"").split(",").pop().trim().toUpperCase())}</span><b>${n.mins||Math.max(1,Math.round(wordsIn(n)/180))} min</b><span>${d?"已完成":n.desk?"待編輯":"待讀"}</span></span></button>`;
 }
 function vNews(){
@@ -514,15 +534,16 @@ function vNews(){
     <div class="stat"><b>${S.jar.length}</b><span>單字罐</span></div></div>`;
   const rk=rankOf(S.xp||0);
   h+=`<div class="card" style="margin-top:12px"><div class="row" style="justify-content:space-between"><div><div class="small muted">妳在編輯台的職位</div><div style="font-weight:700;font-size:18px">${rk.name}</div></div><div class="small muted" style="font-family:var(--f-mono)">${S.xp||0} XP${rk.next?` / ${rk.next}`:""}</div></div>${rk.next?`<div class="bar"><i style="width:${Math.min(100,Math.round(((S.xp||0)-rk.base)/(rk.next-rk.base)*100))}%"></i></div><div class="small muted">再 ${rk.next-(S.xp||0)} XP 升上「${RANKS[rk.i+1][1]}」</div>`:`<div class="small muted">已經是主編了！</div>`}</div>`;
-  h+=weakCardHTML()+boardHTML()+inboxHTML();
+  h+=weeklyCardHTML()+weakCardHTML()+boardHTML()+inboxHTML();
   if(due) h+=`<div class="card row" style="margin-top:12px;justify-content:space-between"><div><h3>單字罐裡有 ${due} 個字該複習了</h3><div class="small muted">隔幾天再見一次，最容易記住。</div></div><button class="btn" data-act="startReview">去複習</button></div>`;
-  h+=`<p class="small muted" style="margin:14px 0 0">妳是英文報社的新人編輯。每天桌上有兩種工作：<b>稿件</b>是根據當天真實時事寫成的報導，要讀稿、下標題、抓出混進去的錯、砍掉一段、回覆讀者來信；<b>外電</b>是真的新聞原文，到原網站讀完，回來挑重點、答題。完成就升職、在護照蓋章。題型仿考試閱讀測驗。目前推薦難度：<b>${LEVELS[S.rec].n}</b></p>`;
+  h+=`<p class="small muted" style="margin:14px 0 0">妳是英文報社的新人編輯。每天桌上的稿件都根據當天真實時事寫成，包含當天的頭條：讀稿、下標題、拆解長句、抓出混進去的錯、砍掉一段、回覆讀者來信。完成就升職、在護照蓋章；想讀原汁原味的新聞，最下面有延伸閱讀。題型仿考試閱讀測驗。目前推薦難度：<b>${LEVELS[S.rec].n}</b></p>`;
   if(rec){h+=`<div class="sec-head"><h2>今天先處理這篇</h2></div><div class="cards">${newsCard(rec,true)}</div>`;}
-  const rest=NEWS_LIST.filter(n=>!rec||n.id!==rec.id);
+  const rest=NEWS_LIST.filter(n=>n.desk&&(!rec||n.id!==rec.id));
   const byDate={};rest.forEach(n=>{(byDate[n.date]=byDate[n.date]||[]).push(n);});
   for(const d of Object.keys(byDate).sort().reverse()){
-    h+=`<div class="sec-head"><h2>${d===today()?"今天":d.slice(5).replace("-","月")+"日"}的稿件與外電</h2><span class="small muted">${byDate[d].length} 則</span></div><div class="cards">${byDate[d].map(n=>newsCard(n,false)).join("")}</div>`;
+    h+=`<div class="sec-head"><h2>${d===today()?"今天":d.slice(5).replace("-","月")+"日"}的稿件</h2><span class="small muted">${byDate[d].length} 則</span></div><div class="cards">${byDate[d].map(n=>newsCard(n,false)).join("")}</div>`;
   }
+  h+=extHTML();
   if(!NEWS_LIST.length)h+=`<div class="card small muted" style="margin-top:12px">新聞還在路上。先讀下面的練習稿，或到「自己貼」貼一篇有興趣的文章。</div>`;
   h+=`<details class="more"><summary>練習稿（12 篇原創短文，抓重點逐段練）</summary>`;
   for(const lv of [1,2,3]){
@@ -643,7 +664,7 @@ function vKeys(){
 /* ---------- QUIZ ---------- */
 function vQuiz(){
   const p=V.p,qs=p.q,i=V.qi,q=qs[i],a=V.ans[i],L="ABCD";
-  const steps=p.desk?stepsHTML(DSTEPS,4):p.news?stepsHTML(NSTEPS,3):pSteps(2);
+  const steps=p.desk?stepsHTML(DSTEPS,5):p.news?stepsHTML(NSTEPS,3):pSteps(2);
   let h=`${steps}<div class="row" style="justify-content:space-between"><span class="chip red">${QTYPE[q.y]||"題目"}</span><span class="small muted">第 ${i+1} / ${qs.length} 題</span></div>${p.desk?`<div class="letter">✉️ 讀者來信</div>`:""}<div class="q-text">${esc(q.t)}</div>`;
   q.o.forEach((o,oi)=>{let c="opt";if(a!==undefined){if(oi===q.a)c+=" right";else if(oi===a)c+=" wrong";}
     h+=`<button class="${c}" data-act="answer" data-o="${oi}" ${a!==undefined?"disabled":""}><span class="L">${L[oi]}</span><span>${esc(o)}</span></button>`;});
@@ -654,11 +675,11 @@ function vQuiz(){
   return h;
 }
 /* ---------- DESK (editor tasks on original reports) ---------- */
-const DSTEPS=["讀稿","下標","抓錯","砍稿","讀者來信"];
-function openDesk(p){V={view:"desk",p,stage:"read",d:{head:null,errPick:null,errHit:false,cut:null},qi:0,ans:[],newWords:0,t0:Date.now()};render();window.scrollTo({top:0});}
+const DSTEPS=["讀稿","下標","拆句","抓錯","砍稿","來信"];
+function openDesk(p){V={view:"desk",p,stage:"read",d:{head:null,errPick:null,errHit:false,cut:null,ls:[null,null,null]},qi:0,ans:[],newWords:0,t0:Date.now()};render();window.scrollTo({top:0});}
 function deskParas(showWrong){const p=V.p;return p.paras.map((pa,pi)=>({s:pa.s.map((s,si)=>(showWrong&&pi===p.err.p&&si===p.err.s)?p.err.wrong:s),k:pa.k,a:pa.a,w:pa.w}));}
 function vDesk(){
-  const p=V.p,D=V.d,st=V.stage,idx={read:0,head:1,err:2,cut:3}[st];
+  const p=V.p,D=V.d,st=V.stage,idx={read:0,head:1,ls:2,err:3,cut:4}[st];
   let h=stepsHTML(DSTEPS,idx)+`<div class="row"><span class="chip">SLUG: ${esc(p.slug)}</span><span class="chip">${esc(p.topic)}</span><span class="chip red">${LEVELS[p.lv].n}</span><span class="small muted">📍 ${esc(p.place)}</span></div>`;
   const view={...p,paras:deskParas(st!=="cut")};
   if(st==="read"){
@@ -668,8 +689,10 @@ function vDesk(){
   } else if(st==="head"){
     h+=`<h2 style="margin-top:0">幫這篇下標題</h2><p class="small muted">好標題要抓到整篇最重要的事，不能誇大，也不能寫文中沒有的內容。</p>`;
     p.heads.o.forEach((o,i)=>{let c="opt";if(D.head!==null){if(i===p.heads.a)c+=" right";else if(i===D.head)c+=" wrong";}h+=`<button class="${c} hd" data-act="dHead" data-i="${i}" ${D.head!==null?"disabled":""}><span class="L">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`;});
-    if(D.head!==null)h+=`<div class="explain"><b style="color:${D.head===p.heads.a?"var(--good)":"var(--bad)"}">${D.head===p.heads.a?"好標題！":"主編改用了 "+"ABCD"[p.heads.a]}</b>　${esc(p.heads.e)}</div><button class="btn wide" data-act="dNext" data-to="err">下一個任務：抓錯 →</button>`;
+    if(D.head!==null)h+=`<div class="explain"><b style="color:${D.head===p.heads.a?"var(--good)":"var(--bad)"}">${D.head===p.heads.a?"好標題！":"主編改用了 "+"ABCD"[p.heads.a]}</b>　${esc(p.heads.e)}</div><button class="btn wide" data-act="dNext" data-to="${p.ls?"ls":"err"}">下一個任務：${p.ls?"拆解長句":"抓錯"} →</button>`;
     h+=`<details class="peek"><summary>回稿件看一下</summary>${passageHTML(view,false)}</details>`;
+  } else if(st==="ls"){
+    h+=lsHTML(p,D.ls,"dLs")+(D.ls.every(x=>x!==null)?`<button class="btn wide" data-act="dNext" data-to="err">下一個任務：抓錯 →</button>`:"");
   } else if(st==="err"){
     h+=`<h2 style="margin-top:0">稿子裡混進了一句錯誤</h2><p class="small muted">有一句的內容和文章其他地方互相矛盾。找出來點它。線索：數字、前後因果、轉折詞。</p>`;
     view.paras.forEach((pa,pi)=>{
@@ -887,12 +910,15 @@ document.addEventListener("click",e=>{
     case "openNews": openNews(findP(d.id));break;
     case "openDesk": openDesk(findP(d.id));break;
     case "titleTap": titleTap();break;
+    case "dLs": {const ok=lsAnswer(V.d.ls,V.p,+d.k,+d.o);save();render();break;}
+    case "drillLs": {V.lsA=V.lsA||[null,null,null];const k=+d.k,before=V.lsA.every(x=>x!==null);const ok=lsAnswer(V.lsA,V.list[V.i].p,k,+d.o);if(k===2&&ok)V.right++;save();render();break;}
+    case "wkSeen": S.wkSeen=monday(today());save();render();break;
     case "setView": setView(d.v);break;
     case "wipePreview": wipePreview();break;
     case "drill": startDrill(d.sk);break;
     case "drillAns": drillAnswer(+d.o);break;
     case "drillKey": drillKey(+d.s);break;
-    case "drillNext": V.i++;V.ans=null;render();window.scrollTo({top:0});break;
+    case "drillNext": V.i++;V.ans=null;V.lsA=null;render();window.scrollTo({top:0});break;
     case "toPassport": go("passport");break;
     case "like": toggleLike(V.p);break;
     case "recOpen": openRecSheet({nid:d.nid||"",url:d.url||"",title:d.title||""});break;
@@ -954,6 +980,43 @@ function titleTap(){const t=Date.now();tapN=t-tapT<700?tapN+1:1;tapT=t;if(tapN<5
 }
 function setView(v){try{if(v==="her")localStorage.setItem("desk_preview","1");else localStorage.removeItem("desk_preview");}catch(e){}location.reload();}
 function wipePreview(){try{localStorage.removeItem("desk-v1-preview");localStorage.setItem("desk_preview","1");}catch(e){}location.reload();}
+/* ---------- long-sentence breakdown ---------- */
+function lsHTML(p,ans,act){
+  const L=p.ls,sent=p.paras[L.p].s[L.s],parts=[["這句的主詞（誰／什麼）是？",L.subj],["這句的主要動詞是？",L.verb],["整句的意思最接近？",L.mean]];
+  let h=`<h2 style="margin-top:0">拆解這個長句</h2><p class="small muted">長句讀不懂，通常是沒抓到主幹。先找主詞和主要動詞，其他部分（that／which 子句、逗號後的補充、-ing／-ed 修飾語）都是掛在主幹上的。</p>
+  <div class="rv-ctx" style="margin-bottom:12px">${esc(sent)}</div>`;
+  parts.forEach((pt,k)=>{
+    if(k>0&&ans[k-1]===null)return;
+    const q=pt[1];h+=`<div class="small" style="font-weight:700;margin:10px 0 6px">${k+1}. ${pt[0]}</div>`;
+    q.o.forEach((o,oi)=>{let c="opt";if(ans[k]!==null){if(oi===q.a)c+=" right";else if(oi===ans[k])c+=" wrong";}h+=`<button class="${c}" data-act="${act}" data-k="${k}" data-o="${oi}" ${ans[k]!==null?"disabled":""} ${k===2?'style="font-family:var(--f-ui)"':""}><span class="L">${"ABCD"[oi]}</span><span>${esc(o)}</span></button>`;});
+  });
+  if(ans.every(x=>x!==null))h+=`<div class="explain"><b>拆解：</b>${esc(L.e)}</div>`;
+  return h;
+}
+function lsAnswer(ans,p,k,o){if(ans[k]!==null)return false;ans[k]=o;const q=[p.ls.subj,p.ls.verb,p.ls.mean][k];recSkill("ls",o===q.a);return o===q.a;}
+/* ---------- weekly review ---------- */
+function monday(ds){const d=new Date(ds+"T00:00:00");const w=(d.getDay()+6)%7;d.setDate(d.getDate()-w);return d.toLocaleDateString("sv");}
+function weekSummary(start){
+  const end=addDays(start,6),al=(S.al||[]).filter(x=>x.d>=start&&x.d<=end),reads=S.log.filter(l=>l.date>=start&&l.date<=end);
+  const by={};al.forEach(x=>{(by[x.sk]=by[x.sk]||{n:0,ok:0});by[x.sk].n++;if(x.ok)by[x.sk].ok++;});
+  return {start,end,reads:reads.length,n:al.length,ok:al.filter(x=>x.ok).length,by,days:new Set(reads.map(l=>l.date)).size};
+}
+function weeklyCompare(){
+  const thisMon=monday(today()),lastMon=addDays(thisMon,-7),prevMon=addDays(thisMon,-14);
+  const L=weekSummary(lastMon),P=weekSummary(prevMon);let best=null;
+  for(const k of Object.keys(L.by)){const a=L.by[k],b=P.by[k];if(!SK[k]||a.n<3||!b||b.n<3)continue;const d=a.ok/a.n-b.ok/b.n;if(!best||d>best.d)best={k,d};}
+  return {L,P,best,thisMon};
+}
+function weeklyBody(W){
+  const L=W.L,acc=L.n?Math.round(L.ok/L.n*100):null,P=W.P,pacc=P.n?Math.round(P.ok/P.n*100):null,w=weakest();
+  return `<div class="mini-stats" style="margin-top:6px"><span>讀了 <b>${L.reads}</b> 篇</span><span>練習 <b>${L.days}</b> 天</span><span>答題 <b>${L.n}</b> 題</span>${acc!==null?`<span>正確率 <b>${acc}%</b>${pacc!==null?`（前一週 ${pacc}%）`:""}</span>`:""}</div>
+  ${W.best&&W.best.d>0?`<div class="small" style="margin-top:6px">進步最多：<b>${SK[W.best.k].n}</b>（+${Math.round(W.best.d*100)}%）</div>`:""}
+  ${w?`<div class="small" style="margin-top:4px">這週建議加強：<b>${SK[w.k].n}</b></div>`:""}`;
+}
+function weeklyCardHTML(){
+  const W=weeklyCompare();if(!W.L.reads&&!W.L.n)return "";if(S.wkSeen===W.thisMon)return "";
+  return `<div class="card weekly" style="margin-top:12px"><div class="row" style="justify-content:space-between"><b>上週回顧</b><span class="small muted">${W.L.start.slice(5).replace("-","/")}–${W.L.end.slice(5).replace("-","/")}</span></div>${weeklyBody(W)}<div class="row" style="margin-top:8px;justify-content:flex-end"><button class="react" data-act="tab" data-v="stats">看詳細分析</button><button class="react" data-act="wkSeen">知道了</button></div></div>`;
+}
 /* ---------- skill tracking & weakness analysis ---------- */
 const SK={
   main:{n:"主旨",d:"抓全文在講什麼、下標題",tip:"先看首段和末段，找全文反覆出現的概念。選項只講到某一段（太細）或超出文章範圍（太廣）都不對。"},
@@ -961,15 +1024,17 @@ const SK={
   detail:{n:"細節",d:"找出文中明確寫到的資訊",tip:"用題目裡的關鍵字回原文定位，再逐字比對。特別注意數字、否定詞（not, never）和比較級。"},
   infer:{n:"推論",d:"讀出文中沒直接寫的意思",tip:"正解一定能在文中找到依據，只是沒有直接寫出來。先刪掉「延伸太多」和「太絕對（always, only, never）」的選項。"},
   vocab:{n:"字義",d:"從上下文猜單字意思",tip:"看前後的線索：同義改寫、對比（but, rather than）、解釋（i.e., —）。把選項代回句子讀一次，最通順的通常是答案。"},
+  ls:{n:"長句拆解",d:"找出長句的主幹與意思",tip:"先找主要動詞（不是 that／which 子句裡的，也不是 -ing／-ed 修飾語），再往前找它的主詞。逗號、冒號、關係代名詞後面多半是補充。主幹讀懂了，整句意思就出來了。"},
   intent:{n:"作者意圖",d:"作者的目的與態度",tip:"留意作者用的形容詞和轉折後的立場。題目問「為什麼提到某例子」時，答案通常是「支持前一句的論點」。"},
   logic:{n:"邏輯檢查",d:"發現前後矛盾的句子",tip:"讀的時候順手記下數字、因果和立場，遇到跟前文對不上的地方就停下來比對。"}
 };
-const SK_ORDER=["main","key","detail","infer","vocab","intent","logic"];
+const SK_ORDER=["main","key","ls","detail","infer","vocab","intent","logic"];
 const Y2SK={main:"main",detail:"detail",ref:"detail",infer:"infer",apply:"infer",vocab:"vocab",purpose:"intent",attitude:"intent"};
 const MIN_N=5;
 function recSkill(sk,ok){
   if(!SK[sk])return;S.sk=S.sk||{};const r=S.sk[sk]||(S.sk[sk]={n:0,ok:0,h:[]});
   r.n++;if(ok)r.ok++;r.h.push(ok?1:0);if(r.h.length>40)r.h.shift();
+  S.al=S.al||[];S.al.push({d:today(),sk,ok:ok?1:0});if(S.al.length>3000)S.al.splice(0,S.al.length-3000);
 }
 function qid(p,i){return p.id+"#"+i;}
 function markWrong(p,i,ok){S.wrong=S.wrong||[];const k=qid(p,i);const at=S.wrong.indexOf(k);if(ok){if(at>=0)S.wrong.splice(at,1);}else if(at<0){S.wrong.push(k);if(S.wrong.length>200)S.wrong.shift();}}
@@ -1002,6 +1067,8 @@ function vStats(){
     <div class="small">最近 ${Math.min(20,w.n)} 題答對 ${Math.round(w.acc*Math.min(20,w.n))} 題（${Math.round(w.acc*100)}%）</div>
     <div class="tipbox"><b>技巧：</b>${SK[w.k].tip}</div><button class="btn wide" style="margin-top:10px" data-act="drill" data-sk="${w.k}">針對「${SK[w.k].n}」練習</button></div>`;
   else if(tot>=MIN_N)h+=`<div class="card"><b>目前各題型都在 80% 以上</b><div class="small muted">很穩！可以試試更高難度的稿件。</div></div>`;
+  {const W=weeklyCompare();if(W.L.reads||W.L.n)h+=`<h2>上週回顧</h2><div class="card weekly">${weeklyBody(W)}</div>`;
+   const T=weekSummary(W.thisMon);if(T.reads||T.n)h+=`<div class="small muted" style="margin-top:6px">這週到目前：讀了 ${T.reads} 篇、答題 ${T.n} 題${T.n?`、正確率 ${Math.round(T.ok/T.n*100)}%`:""}</div>`;}
   h+=`<h2>各題型表現</h2><div class="skills">`;
   for(const k of SK_ORDER){
     const s=skillStat(k);
@@ -1026,6 +1093,7 @@ function drillBank(sk){
   const wrong=new Set(S.wrong||[]);
   for(const p of pool){
     if(!S.done[p.id])continue;
+    if(sk==="ls"){if(p.ls)items.push({t:"ls",p,w:0});continue;}
     if(sk==="key"){p.paras.forEach((pa,pi)=>{if(typeof pa.k==="number"&&pa.s.length>1)items.push({t:"key",p,pi,w:0});});continue;}
     p.q.forEach((q,i)=>{const k=qid(p,i);if(sk==="wrong"?wrong.has(k):(Y2SK[q.y]===sk||(sk==="main"&&q.y==="main")))items.push({t:"q",p,i,w:wrong.has(k)?1:0});});
     if(sk==="main"&&p.heads)items.push({t:"head",p,w:0});
@@ -1046,6 +1114,7 @@ function vDrill(){
   const it=D.list[D.i],p=it.p,L="ABCD";
   let h=`<div class="row" style="justify-content:space-between"><span class="chip red">${title}</span><span class="small muted">${D.i+1} / ${D.list.length}</span></div>
   <div class="small muted" style="margin-top:6px">出自：${esc(p.desk?p.zh:p.title)}</div>`;
+  if(it.t==="ls"){D.lsA=D.lsA||[null,null,null];h+=lsHTML(p,D.lsA,"drillLs");if(D.lsA.every(x=>x!==null))h+=`<button class="btn wide" data-act="drillNext">下一題 →</button>`;return h;}
   if(it.t==="key"){
     const pa=p.paras[it.pi];
     h+=`<h2 style="margin-top:8px">哪一句最能代表這段？</h2><div class="para-card ${D.ans!==null?"locked":""}">`+pa.s.map((s,si)=>{let c="sent";if(D.ans!==null){if(si===pa.k)c+=" ok";else if(si===D.ans&&(pa.a||[]).includes(si))c+=" half";else if(si===D.ans)c+=" no";}return `<span class="${c}" data-act="drillKey" data-s="${si}" role="button" tabindex="0">${esc(s)}</span>`;}).join(" ")+`</div>`;
@@ -1172,6 +1241,7 @@ function openRecItem(id){const r=SY.inbox.find(x=>x.id===id);if(!r)return;const 
   if(!PREVIEW)SY.db.doc(`pairs/${PAIR}/recs/${id}`).update({read:true}).catch(()=>{});
   if(n){n.desk?openDesk(n):openNews(n);}else if(r.url){window.open(r.url,"_blank","noopener");}}
 function reactRec(id,r){if(PREVIEW){toast("預覽模式不會真的送出");return;}SY.db.doc(`pairs/${PAIR}/recs/${id}`).update({read:true,react:r}).then(()=>toast("已回應")).catch(()=>toast("等一下再試"));}
+restoreWip();
 render();
 initSync();
 
