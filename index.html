@@ -635,7 +635,7 @@ function vNews(){
   h+=`<div class="card" style="margin-top:12px"><div class="row" style="justify-content:space-between"><div><div class="small muted">妳在分析室的職位</div><div style="font-weight:700;font-size:18px">${rk.name}</div></div><div class="small muted" style="font-family:var(--f-mono)">${S.xp||0} XP${rk.next?` / ${rk.next}`:""}</div></div>${rk.next?`<div class="bar"><i style="width:${Math.min(100,Math.round(((S.xp||0)-rk.base)/(rk.next-rk.base)*100))}%"></i></div><div class="small muted">再 ${rk.next-(S.xp||0)} XP 升上「${RANKS[rk.i+1][1]}」</div>`:`<div class="small muted">已經是情報主管了！</div>`}</div>`;
   payPreds();h+=predCardHTML()+paperCardHTML()+weeklyCardHTML()+weakCardHTML()+boardHTML()+inboxHTML();
   if(due) h+=`<div class="card row" style="margin-top:12px;justify-content:space-between"><div><h3>單字罐裡有 ${due} 個字該複習了</h3><div class="small muted">隔幾天再見一次，最容易記住。</div></div><button class="btn" data-act="startReview">去複習</button></div>`;
-  h+=`<p class="small muted" style="margin:14px 0 0">妳是情報分析室的新進分析師。每天的情報都根據當天真實時事寫成，主力是 <b>GRE 難度</b>：研讀情報（紅底線是 GRE 字）、把 GRE 字填回原句、下結論、拆長句或找可疑情報、評估論證（假設・支持・削弱・句子功能），最後預測事情會怎麼發展，幾天後揭曉。想讀原文，最下面有延伸閱讀。目前推薦難度：<b>${LEVELS[S.rec].n}</b>（${LEVELS[S.rec].d}）</p>`;
+  h+=`<p class="small muted" style="margin:14px 0 0">妳是情報分析室的新進分析師。每天的情報都根據當天真實時事寫成，主力是 <b>GRE 難度</b>：研讀情報（紅底線是 GRE 字，點一下看意思）、下結論、拆長句或找可疑情報、回答閱讀理解題（主旨・推論・假設・支持削弱・句子功能・字義），最後預測事情會怎麼發展，幾天後揭曉。想讀原文，最下面有延伸閱讀。目前推薦難度：<b>${LEVELS[S.rec].n}</b>（${LEVELS[S.rec].d}）</p>`;
   if(rec){h+=`<div class="sec-head"><h2>今天的優先情報</h2></div><div class="cards">${newsCard(rec,true)}</div>`;}
   const rest=NEWS_LIST.filter(n=>n.desk&&(!rec||n.id!==rec.id));
   const byDate={};rest.forEach(n=>{(byDate[n.date]=byDate[n.date]||[]).push(n);});
@@ -766,7 +766,7 @@ function vKeys(){
 function vQuiz(){
   const p=V.p,qs=p.q,i=V.qi,q=qs[i],a=V.ans[i],L="ABCD";
   const steps=p.desk?stepsHTML(planOf().map(s=>DLABEL[s]),planOf().indexOf("mail")):p.news?stepsHTML(NSTEPS,3):pSteps(2);
-  let h=`${steps}<div class="row" style="justify-content:space-between"><span class="chip red">${QTYPE[q.y]||"題目"}</span><span class="small muted">第 ${i+1} / ${qs.length} 題</span></div>${p.desk?`<div class="letter">${p.lv>=3?"🗂 評估論證":"✉️ 讀者來信"}</div>`:""}<div class="q-text">${esc(q.t)}</div>`;
+  let h=`${steps}<div class="row" style="justify-content:space-between"><span class="chip red">${QTYPE[q.y]||"題目"}</span><span class="small muted">第 ${i+1} / ${qs.length} 題</span></div>${p.desk?`<div class="letter">${p.lv>=3?"🗂 閱讀理解":"✉️ 讀者來信"}</div>`:""}<div class="q-text">${esc(q.t)}</div>`;
   q.o.forEach((o,oi)=>{let c="opt";if(a!==undefined){if(oi===q.a)c+=" right";else if(oi===a)c+=" wrong";}
     h+=`<button class="${c}" data-act="answer" data-o="${oi}" ${a!==undefined?"disabled":""}><span class="L">${L[oi]}</span><span>${esc(o)}</span></button>`;});
   if(a!==undefined)h+=`<div class="explain"><b style="color:${a===q.a?"var(--good)":"var(--bad)"}">${a===q.a?"答對了":"正解是 "+L[q.a]}</b>　${esc(q.e||"")}</div><button class="btn wide" data-act="nextQ">${i+1<qs.length?"下一題 →":"看結果"}</button>`;
@@ -776,7 +776,7 @@ function vQuiz(){
   return h;
 }
 /* ---------- DESK (editor tasks on original reports) ---------- */
-const DLABEL={read:"研讀",gre:"GRE 字",head:"下結論",ls:"拆長句",err:"可疑情報",cut:"刪冗餘",mail:"評估論證",pred:"預測"};
+const DLABEL={read:"研讀",gre:"GRE 字",head:"下結論",ls:"拆長句",err:"可疑情報",cut:"刪冗餘",mail:"閱讀理解",pred:"預測"};
 const TASK_ORDER=["head","ls","err","cut","mail"];
 function seededShuffle(arr,seed){let h=2166136261;for(const c of seed){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}const a=arr.slice();for(let i=a.length-1;i>0;i--){h^=h<<13;h^=h>>>17;h^=h<<5;const j=(h>>>0)%(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
 function makePlan(p){
@@ -785,7 +785,7 @@ function makePlan(p){
   if(p.lv>=3){
     const three=["ls","err","cut"].filter(t=>t!=="ls"||p.ls);let pk=seededShuffle(three,p.id+ME);
     if(pref&&three.includes(pref))pk=[pref].concat(pk.filter(x=>x!==pref));
-    const pl=["read"];if(greQs(p))pl.push("gre");pl.push("head",pk[0],"mail");
+    const pl=["read","head",pk[0],"mail"];
     if(p.pred&&!RES.has(p.id)&&p.pred.due>=today())pl.push("pred");
     return pl;
   }
@@ -796,7 +796,7 @@ function makePlan(p){
 }
 function planOf(){return V.plan||(V.plan=["read","head"].concat(V.p.ls?["ls"]:[],["err","cut","mail"]));}
 function nextStage(){const pl=planOf(),i=pl.indexOf(V.view==="quiz"?"mail":V.stage);return pl[i+1];}
-function nextBtn(){const n=nextStage(),lab=(V.p.lv>=3?{gre:"下一步：把 GRE 字填回去",head:"下一步：下結論",ls:"下一步：拆解長句",err:"下一步：找出可疑情報",cut:"下一步：刪減冗餘",mail:"下一步：評估論證",pred:"最後：做出預測"}:{head:"去下標題",ls:"下一個任務：拆解長句",err:"下一個任務：抓錯",cut:"下一個任務：砍稿",mail:"最後：回覆讀者來信"})[n]||"完成，歸檔到今天的摘要";
+function nextBtn(){const n=nextStage(),lab=(V.p.lv>=3?{gre:"下一步：把 GRE 字填回去",head:"下一步：下結論",ls:"下一步：拆解長句",err:"下一步：找出可疑情報",cut:"下一步：刪減冗餘",mail:"下一步：閱讀理解題",pred:"最後：做出預測"}:{head:"去下標題",ls:"下一個任務：拆解長句",err:"下一個任務：抓錯",cut:"下一個任務：砍稿",mail:"最後：回覆讀者來信"})[n]||"完成，歸檔到今天的摘要";
   return `<button class="btn wide" data-act="dNext">${V.stage==="read"&&(n==="head"||n==="gre")?"讀完了，"+lab:lab} →</button>`;}
 function openDesk(p){V={view:"desk",plan:makePlan(p),p,stage:"read",d:{head:null,errPick:null,errHit:false,cut:null,ls:[null,null,null],gre:null},gq:greQs(p),qi:0,ans:[],newWords:0,t0:Date.now()};render();window.scrollTo({top:0});}
 function deskParas(showWrong){const p=V.p;return p.paras.map((pa,pi)=>({s:pa.s.map((s,si)=>(showWrong&&pi===p.err.p&&si===p.err.s)?p.err.wrong:s),k:pa.k,a:pa.a,w:pa.w}));}
@@ -805,7 +805,7 @@ function vDesk(){
   let h=stepsHTML(planOf().map(s=>DLABEL[s]),planOf().indexOf(st))+`<div class="row"><span class="chip">代號 ${esc(p.slug)}</span><span class="chip">${esc(p.topic)}</span><span class="chip red">${LEVELS[p.lv].n}</span><span class="small muted">📍 ${esc(p.place)}</span></div>`;
   const pl0=planOf(),view={...p,paras:deskParas(pl0.includes("err")&&pl0.indexOf(st)<=pl0.indexOf("err"))};
   if(st==="read"){
-    h+=diffLine(p)+`<div class="memo">${p.lv>=3?`<b>組長簡報：</b>這份是 ${esc(p.zh)}。先完整讀一遍：虛線是生字、<span class="w gre" style="cursor:default">紅底線</span>是 GRE 字，點一下看意思。接著要妳把 GRE 字填回原句、下結論、評估論證，最後判斷事情會怎麼發展。`:`<b>主編留言：</b>這篇是今天的 ${esc(p.zh)}。先完整讀一遍，不懂的字點一下。等一下要妳下標題、檢查有沒有寫錯的地方，版面不夠還要砍一段。`}</div>
+    h+=diffLine(p)+`<div class="memo">${p.lv>=3?`<b>組長簡報：</b>這份是 ${esc(p.zh)}。先完整讀一遍：虛線是生字、<span class="w gre" style="cursor:default">紅底線</span>是 GRE 字，點一下看意思。接著要妳下結論、回答閱讀理解題，最後判斷事情會怎麼發展。`:`<b>主編留言：</b>這篇是今天的 ${esc(p.zh)}。先完整讀一遍，不懂的字點一下。等一下要妳下標題、檢查有沒有寫錯的地方，版面不夠還要砍一段。`}</div>
     <div class="row" style="justify-content:flex-end"><label class="toggle" for="hintT"><input type="checkbox" id="hintT" data-act="hints" ${S.hints?"checked":""}>虛線提示生字</label></div>
     ${passageHTML(view,true)}${nextBtn()}`;
   } else if(st==="head"){
