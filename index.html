@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>情報分析室</title>
+<title>情報社</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Literata:opsz,wght@7..72,400;7..72,600&family=Newsreader:opsz,wght@6..72,600;6..72,700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -256,13 +256,27 @@ nav.tabs button{font-size:13px}
 .opt.picked{border-color:var(--navy);background:var(--navy-soft)}.opt.picked .L{background:var(--navy);color:var(--card)}
 .pred-row{border-top:1px dashed var(--line);padding:8px 0 2px;margin-top:8px;font-family:var(--f-read)}
 .pred-row.hit b{color:var(--good)}.pred-row.miss b{color:var(--bad)}
+.firm-head .cash{font-family:var(--f-mono);font-size:24px;font-weight:700;color:var(--good)}
+.hours{display:flex;align-items:center;gap:5px;margin:10px 0 6px;font-size:13px}.hours i{width:14px;height:14px;border-radius:4px;border:1.5px solid var(--navy);display:inline-block}.hours i.on{background:var(--navy)}
+.jobs{display:grid;gap:10px}.job{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px}.job.done{opacity:.6}
+.jtop{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px}.jcl{font-weight:600}.jkind{margin:6px 0 4px;font-family:var(--f-read);font-size:16px}.fee{font-family:var(--f-mono);font-size:17px;color:var(--good)}
+.client{background:var(--navy-soft);border-radius:14px;padding:12px 14px;margin-bottom:10px}.client .ask{font-family:var(--f-read);font-size:16px;line-height:1.55;margin:8px 0}
+.claim{font-family:var(--f-read);font-size:17px;line-height:1.55;background:var(--card);border-left:4px solid var(--accent);padding:10px 12px;border-radius:8px;margin:10px 0}
+.modebar{display:flex;gap:6px;margin:10px 0}.modebar button{flex:1;padding:8px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);font-size:14px}.modebar button.on{border-color:var(--navy);background:var(--navy);color:var(--card)}
+.jpass.boxed{max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:6px 12px;margin-top:6px}
+.jpass .sent{border-radius:4px;transition:background .15s}.jpass .sent[data-act]{cursor:pointer;background:rgba(80,110,180,.07)}.jpass .sent.dim{opacity:.45}
+.jpass .sent.sel{background:#ffe9a8;box-shadow:0 0 0 2px #f2c94c}.jpass .sent.ans{background:var(--good-soft);box-shadow:0 0 0 2px var(--good)}.jpass .sent.bad{background:var(--bad-soft);box-shadow:0 0 0 2px var(--bad)}.jpass .sent.half{background:var(--navy-soft)}.jpass .sent.tgt{background:#ffe9a8}
+.jpass p.tp{border-left:3px solid var(--accent);padding-left:8px}.jpass p.hlp{background:rgba(242,201,76,.15);border-radius:8px}
+.vbtns .opt{justify-content:center}.rep{display:grid;grid-template-columns:7em 1fr 3em;align-items:center;gap:8px;margin:6px 0;font-size:14px}.rep .bar{margin:0}
+.react.on{background:var(--navy);color:var(--card)}
+.jrows{display:grid;gap:6px;margin-top:8px}.jrow{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:8px;text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:8px 10px;width:100%}.jrow:hover{border-color:var(--navy)}.jr-m{display:flex;flex-direction:column}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="top">
     <div class="emblem" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="16" cy="16" r="12"/><ellipse cx="16" cy="16" rx="5.5" ry="12"/><path d="M4 16h24M6 10h20M6 22h20"/></svg></div>
-    <div class="brand"><h1 data-act="titleTap" style="cursor:default;user-select:none">情報分析室</h1><p>Real news, GRE-level reading.</p></div>
+    <div class="brand"><h1 data-act="titleTap" style="cursor:default;user-select:none">情報社</h1><p>Real news, real clients, GRE-level reading.</p></div>
   </header>
   <div id="previewBar" class="previewbar" hidden>預覽中：彣的視角（不會同步）</div>
   <nav class="tabs" id="tabs" aria-label="主選單"></nav>
@@ -581,11 +595,11 @@ let V={view:"news"};
 function go(view,extra){V=Object.assign({view},extra||{});render();window.scrollTo({top:0});}
 function renderTabs(){
   const due=dueWords().length;
-  const tabs=[["news","情報"],["paper","摘要"],["paste","自己貼"],["jar","單字罐"+(due?`<span class="dot">${due}</span>`:"")],["stats","進度"]];
-  const cur={nprep:"news",nkeys:"news",desk:"news",read:"news",keys:"news",quiz:V.p&&V.p.paste?"paste":"news",result:V.p&&V.p.paste?"paste":"news",review:"jar",passport:"stats",backup:"stats",drill:"stats",pread:"paste",pkeys:"paste",pgist:"paste"}[V.view]||V.view;
+  const tabs=[["news","情報社"],["paste","自己貼"],["jar","單字罐"+(due?`<span class="dot">${due}</span>`:"")],["stats","進度"]];
+  const cur={job:"news",jobres:"news",nprep:"news",nkeys:"news",desk:"news",read:"news",keys:"news",quiz:V.p&&V.p.paste?"paste":"news",result:V.p&&V.p.paste?"paste":"news",review:"jar",passport:"stats",backup:"stats",drill:"stats",pread:"paste",pkeys:"paste",pgist:"paste"}[V.view]||V.view;
   $("#tabs").innerHTML=tabs.map(([k,l])=>`<button data-act="tab" data-v="${k}" class="${cur===k?"on":""}">${l}</button>`).join("");
 }
-const WIP_VIEWS=["desk","nprep","nkeys","read","keys","quiz","pread","pkeys","pgist"];
+const WIP_VIEWS=["job","desk","nprep","nkeys","read","keys","quiz","pread","pkeys","pgist"];
 function saveWip(){
   try{
     if(WIP_VIEWS.includes(V.view)&&V.p){const snap=Object.assign({},V,{p:V.p.paste?V.p:{id:V.p.id}});localStorage.setItem(KEY+"_wip",JSON.stringify({t:Date.now(),v:snap}));}
@@ -602,7 +616,7 @@ function render(){
   renderTabs();
   saveWip();
   const pb=$("#previewBar");if(pb)pb.hidden=!PREVIEW;
-  const f={paper:vPaper,stats:vStats,drill:vDrill,desk:vDesk,news:vNews,nprep:vPrep,nkeys:vNKeys,read:vRead,keys:vKeys,quiz:vQuiz,result:vResult,passport:vPassport,backup:vBackup,jar:vJar,review:vReview,paste:vPaste,pread:vRead,pkeys:vKeys,pgist:vGist}[V.view]||vNews;
+  const f={paper:vPaper,stats:vStats,drill:vDrill,desk:vDesk,news:vFirm,job:vJob,jobres:vJobRes,nprep:vPrep,nkeys:vNKeys,read:vRead,keys:vKeys,quiz:vQuiz,result:vResult,passport:vPassport,backup:vBackup,jar:vJar,review:vReview,paste:vPaste,pread:vRead,pkeys:vKeys,pgist:vGist}[V.view]||vNews;
   $("#app").innerHTML=f();
   document.body.classList.toggle("hints-off",!S.hints);
 }
@@ -1074,6 +1088,233 @@ function vGist(){
   return h;
 }
 
+/* ================= 情報社：經營模擬 ================= */
+const DEPTS={pol:{n:"政策部",i:"🏛"},biz:{n:"商業部",i:"💼"},sci:{n:"科學部",i:"🔬"},cul:{n:"文化部",i:"🎭"},life:{n:"生活部",i:"☕"}};
+const CLIENTS={
+  pol:[["議員助理 Mara","🏛"],["NGO 研究員 Tomás","🌍"],["智庫分析師 Leila","📚"]],
+  biz:[["基金經理 Victor","📈"],["新創老闆 Kenji","🚀"],["採購主管 Ana","📦"]],
+  sci:[["科學雜誌編輯 Hana","🧪"],["研究室主持人 Dr. Osei","🔬"],["紀錄片導演 Lucas","🎥"]],
+  cul:[["博物館策展人 Elise","🖼"],["出版社編輯 Noor","📖"],["紀錄片導演 Lucas","🎥"]],
+  life:[["高中老師 陳老師","✏️"],["旅行社 Pablo","🧳"],["讀者 小安","✉️"]]};
+const KINDS={
+  brief:{n:"重點簡報",i:"📝",mult:1,ask:(j,n)=>`我等一下要跟團隊報告「${n.zh}」，但沒時間讀全文。請在${j.pp.map(x=>`第 ${x+1} 段`).join("、")}各幫我標出最重要的一句，再給我一句話的結論。`},
+  verify:{n:"查證",i:"🔎",mult:1.1,ask:(j,n)=>`我在別處看到下面這句話，說是根據「${n.zh}」這份情報。這說法對嗎？請判斷，並標出能證明的原句。`},
+  review:{n:"論證審查",i:"⚖️",mult:1.8,ask:(j,n)=>`我們要根據「${n.zh}」這份分析做決定，但團隊對內容有幾個疑問，請幫我逐一回答。`},
+  parse:{n:"長句解讀",i:"🧩",mult:.8,ask:(j,n)=>`「${n.zh}」裡有一句話我讀了三遍還是看不懂，可以幫我拆解嗎？`},
+  forecast:{n:"情勢預估",i:"🔮",mult:1.2,ask:(j,n)=>`我們要根據「${n.zh}」安排下一步，想聽妳的判斷。報酬在結果揭曉後支付，判斷對了另有獎金。`}};
+const KIND_ORDER=["brief","verify","review","parse","forecast"];
+const VERDICTS=["情報支持這個說法","情報和這個說法矛盾","情報沒有提到"];
+const OFFICES=[["taipei","台北總部",0],["singapore","新加坡分部",600],["geneva","日內瓦分部",1500],["tokyo","東京分部",3000],["london","倫敦分部",5000],["nairobi","奈洛比分部",8000],["newyork","紐約分部",12000]];
+const STAFF=[{k:"iris",n:"Iris",role:"證據獵人",cost:500,d:"查證時指出證據在哪一段；重點簡報時把每段縮小到兩個候選句。"},
+  {k:"nora",n:"Nora",role:"刪去法專家",cost:700,d:"選擇題先幫妳刪掉一個錯的選項。"},
+  {k:"max",n:"Max",role:"專案經理",cost:1200,d:"每天多一個工時。"}];
+const FRANKS=[[0,"個人工作室"],[800,"小型情報社"],[2500,"區域情報社"],[6000,"國際情報社"],[12000,"全球情報網"]];
+
+function F(){
+  const f=S.firm||(S.firm={});
+  f.cash=f.cash||0;f.earned=f.earned||0;f.rep=f.rep||{};f.offices=f.offices||["taipei"];f.staff=f.staff||[];f.done=f.done||{};f.pend=f.pend||{};
+  if(!f.day||f.day.d!==today())f.day={d:today(),used:0};
+  return f;
+}
+function firmRank(){const e=F().earned;let i=0;FRANKS.forEach((r,k)=>{if(e>=r[0])i=k;});return {i,name:FRANKS[i][1],base:FRANKS[i][0],next:FRANKS[i+1]?FRANKS[i+1][0]:null};}
+function cap(){const f=F();return 2+f.offices.length+(f.staff.includes("max")?1:0);}
+function repLv(dp){return Math.min(5,Math.floor((F().rep[dp]||0)/60));}
+function hashN(s){let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))|0;return Math.abs(h);}
+function deptOf(n){const t=(n.topic||"")+" "+(n.zh||"");
+  if(/經濟|商業|科技|貿易|市場|金融|產業|能源/.test(t))return "biz";
+  if(/公衛|醫|科學|環境|氣候|太空|健康|生物|自然/.test(t))return "sci";
+  if(/文化|藝術|歷史|人物|宗教|運動|體育|考古|教育|音樂|電影/.test(t))return "cul";
+  if(/國際|外交|政治|政策|法律|戰|選舉|社會|安全/.test(t))return "pol";return "life";}
+function jobsOf(n){
+  if(n._jobs)return n._jobs;
+  const dp=deptOf(n),cl=CLIENTS[dp],J=[];let ci=hashN(n.id)%cl.length;
+  const add=(kind,x)=>J.push(Object.assign({id:n.id+"~"+kind,n,kind,dept:dp,cl:cl[(ci++)%cl.length]},x));
+  if(n.paras&&n.heads){const ks=n.paras.map((pa,i)=>i).filter(i=>typeof n.paras[i].k==="number");if(ks.length>=2)add("brief",{pp:seededShuffle(ks,n.id+"bp").slice(0,2).sort((a,b)=>a-b)});}
+  if(n.err)add("verify",{claim:n.err.wrong,v:1,ev:[n.err.p,n.err.s],e:n.err.e});
+  (n.claims||[]).forEach((c,i)=>{if(c&&c.c&&[0,1,2].includes(c.v))add("verify",{id:n.id+"~v"+i,claim:c.c,v:c.v,ev:c.v===2?null:c.ev,e:c.e||""});});
+  if(n.q&&n.q.length)add("review",{qs:n.q.map((q,i)=>i)});
+  if(n.ls)add("parse",{});
+  if(n.pred)add("forecast",{});
+  return n._jobs=J;
+}
+function findJob(id){if(!id)return null;const n=findP(String(id).split("~")[0]);if(!n||!n.desk)return null;return jobsOf(n).find(j=>j.id===id)||null;}
+function jobAvail(j){
+  if(F().done[j.id])return false;
+  if(j.kind==="forecast"){const p=j.n.pred;if(RES.has(j.n.id)||(S.preds||{})[j.n.id]||!p.due||p.due<today())return false;}
+  return true;}
+function jobFresh(j){return j.n.date>=addDays(today(),-2);}
+function jobFee(j){const base={1:100,2:150,3:220}[j.n.lv]||150;return Math.round(base*KINDS[j.kind].mult*(1+repLv(j.dept)*0.1)*(jobFresh(j)?1:0.6)/5)*5;}
+function allJobs(){return NEWS_LIST.filter(n=>n.desk).flatMap(n=>jobsOf(n));}
+function jobSteps(j){return j.kind==="brief"?["mark","head"]:j.kind==="verify"?["verdict"]:j.kind==="review"?j.qs.map(i=>"q"+i):j.kind==="parse"?["ls"]:["pred"];}
+function payForecasts(){
+  const f=F();let msg=[];
+  Object.keys(f.pend).forEach(id=>{const pd=f.pend[id],r=RES.get(pd.nid);if(!r)return;const mine=(S.preds||{})[pd.nid];const hit=mine&&mine.o===r.a;
+    const pay=Math.round(pd.base*(hit?1.5:0.3));f.cash+=pay;f.earned+=pay;if(f.done[id])f.done[id].fee=pay;delete f.pend[id];msg.push(`${hit?"預估命中":"預估落空"} +$${pay}`);});
+  if(msg.length){save();setTimeout(()=>toast(msg.join("・")),500);}
+}
+
+/* ---------- firm home ---------- */
+function jobCard(j){
+  const n=j.n,dn=F().done[j.id],ot=F().day.used>=cap(),fee=jobFee(j);
+  return `<div class="job ${dn?"done":""}">
+    <div class="jtop"><span class="jcl">${j.cl[1]} ${esc(j.cl[0])}</span><span class="chip">${DEPTS[j.dept].i} ${DEPTS[j.dept].n}</span></div>
+    <div class="jkind">${KINDS[j.kind].i} <b>${KINDS[j.kind].n}</b>・${esc(n.zh)}</div>
+    <div class="meta-row"><span class="chip red" title="${esc(LEVELS[n.lv].d)}">${LEVELS[n.lv].n}</span><span class="small muted">${esc(n.date.slice(5).replace("-","/"))}・${esc(n.topic||"")}</span></div>
+    <div class="row" style="justify-content:space-between;margin-top:8px">${dn?`<span class="small muted">已結案・${F().pend[j.id]?"等結果揭曉":`收入 $${dn.fee}`}</span>`:`<b class="fee">$${fee}${ot?` <span class="small muted">加班 ×0.5</span>`:""}</b><button class="btn" data-act="takeJob" data-j="${esc(j.id)}">接案</button>`}</div></div>`;
+}
+function groupHTML(js){
+  const g=[];js.forEach(j=>{let x=g.find(y=>y.n===j.n);if(!x)g.push(x={n:j.n,js:[]});x.js.push(j);});
+  const ot=F().day.used>=cap();
+  return `<div class="jobs">${g.map(({n,js})=>`<div class="job"><div class="jtop"><span class="small muted">${esc(n.date.slice(5).replace("-","/"))}・${esc(n.topic||"")}・${esc((n.place||"").split(",").pop().trim())}</span><span class="chip red" title="${esc(LEVELS[n.lv].d)}">${LEVELS[n.lv].n}</span></div>
+    <div class="jkind" style="font-family:var(--f-head);font-weight:600">${n.top&&n.date>=addDays(today(),-1)?"📌 ":""}${esc(n.zh)}</div>
+    <div class="jrows">${js.map(j=>`<button class="jrow" data-act="takeJob" data-j="${esc(j.id)}"><span>${j.cl[1]}</span><span class="jr-m"><b>${KINDS[j.kind].n}</b><span class="small muted">${esc(j.cl[0])}</span></span><span class="fee">$${jobFee(j)}${ot?"½":""}</span></button>`).join("")}</div></div>`).join("")}</div>`;
+}
+function vFirm(){
+  const f=F();payPreds();payForecasts();
+  const rk=firmRank(),c=cap(),due=dueWords().length;
+  let h=`<div class="card firm-head"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="small muted">${rk.name}</div><h2 style="margin:2px 0 0">${NM[ME]}的情報社</h2></div><div class="cash">$${f.cash.toLocaleString()}</div></div>
+    <div class="hours">今日工時 ${[...Array(c)].map((_,i)=>`<i class="${i<f.day.used?"on":""}"></i>`).join("")}<span class="small muted">${f.day.used}/${c}${f.day.used>=c?"・之後接案算加班（報酬減半）":""}</span></div>
+    <div class="small muted">${f.offices.map(o=>(OFFICES.find(x=>x[0]===o)||[0,o])[1]).join("・")}${f.staff.length?"　團隊："+f.staff.map(k=>STAFF.find(s=>s.k===k).n).join("、"):""}</div>
+    ${rk.next?`<div class="bar"><i style="width:${Math.min(100,Math.round((f.earned-rk.base)/(rk.next-rk.base)*100))}%"></i></div><div class="small muted">累計營收 $${f.earned.toLocaleString()}，到 $${rk.next.toLocaleString()} 升級為「${FRANKS[rk.i+1][1]}」</div>`:`<div class="small muted">累計營收 $${f.earned.toLocaleString()}，已是全球情報網！</div>`}</div>`;
+  h+=predCardHTML();
+  const all=allJobs().filter(jobAvail),fresh=all.filter(jobFresh),old=all.filter(j=>!jobFresh(j));
+  const todayDone=allJobs().filter(j=>(f.done[j.id]||{}).d===today());
+  const sortJ=a=>a.slice().sort((x,y)=>y.n.date.localeCompare(x.n.date)||(y.n.top?1:0)-(x.n.top?1:0)||KIND_ORDER.indexOf(x.kind)-KIND_ORDER.indexOf(y.kind));
+  h+=`<div class="sec-head"><h2>今天的委託</h2><span class="small muted">${fresh.length} 件等妳挑</span></div>`;
+  h+=fresh.length?groupHTML(sortJ(fresh)):`<div class="card small muted">新的委託明天早上送到。可以先處理下面的舊案。</div>`;
+  if(todayDone.length)h+=`<details class="more"><summary>今天已結案（${todayDone.length}）</summary><div class="jobs">${todayDone.map(jobCard).join("")}</div></details>`;
+  if(old.length)h+=`<details class="more"><summary>舊案櫃（${old.length} 件，報酬 6 折）</summary>${groupHTML(sortJ(old))}</details>`;
+  // expansion
+  const nextOff=OFFICES.find(o=>!f.offices.includes(o[0]));
+  h+=`<div class="sec-head"><h2>擴張</h2><span class="small muted">現金 $${f.cash.toLocaleString()}</span></div><div class="jobs">`;
+  if(nextOff)h+=`<div class="job"><div class="jkind">🏢 <b>開設${nextOff[1]}</b></div><div class="small muted">每開一間分部，每天多一個工時。</div><div class="row" style="justify-content:space-between;margin-top:8px"><b class="fee">$${nextOff[2].toLocaleString()}</b><button class="btn ${f.cash<nextOff[2]?"ghost":""}" data-act="buyOffice" ${f.cash<nextOff[2]?"disabled":""}>開設</button></div></div>`;
+  STAFF.filter(s=>!f.staff.includes(s.k)).forEach(s=>{h+=`<div class="job"><div class="jkind">🧑‍💼 <b>雇用 ${s.n}</b>・${s.role}</div><div class="small muted">${s.d}${s.k!=="max"?"接案時可以選擇請她協助，那件案子報酬少 15%。":""}</div><div class="row" style="justify-content:space-between;margin-top:8px"><b class="fee">$${s.cost.toLocaleString()}</b><button class="btn ${f.cash<s.cost?"ghost":""}" data-act="hire" data-k="${s.k}" ${f.cash<s.cost?"disabled":""}>雇用</button></div></div>`;});
+  h+=`</div>`;
+  h+=`<div class="sec-head"><h2>各部門口碑</h2><span class="small muted">口碑每升一級，該部門報酬 +10%</span></div><div class="card">${Object.keys(DEPTS).map(k=>{const r=f.rep[k]||0,lv=repLv(k);return `<div class="rep"><span>${DEPTS[k].i} ${DEPTS[k].n}</span><span class="bar"><i style="width:${lv>=5?100:Math.round((r%60)/60*100)}%"></i></span><span class="small muted">Lv${lv}</span></div>`;}).join("")}</div>`;
+  h+=weeklyCardHTML()+weakCardHTML()+boardHTML()+inboxHTML();
+  if(due)h+=`<div class="card row" style="margin-top:12px;justify-content:space-between"><div><h3>單字罐裡有 ${due} 個字該複習了</h3><div class="small muted">隔幾天再見一次，最容易記住。</div></div><button class="btn" data-act="startReview">去複習</button></div>`;
+  h+=`<p class="small muted" style="margin:14px 0 0">妳經營一家什麼都接的情報社。每天的委託都根據當天真實時事撰寫的情報，難度以 GRE 為主。讀懂情報、標出證據、給出判斷，客戶滿意就有收入和口碑；賺來的錢可以開分部、雇助手。紅底線是 GRE 單字，點一下看意思。</p>`;
+  h+=extHTML();
+  return h;
+}
+
+/* ---------- a job ---------- */
+function takeJob(id){
+  const j=findJob(id);if(!j)return;
+  V={view:"job",jid:j.id,p:j.n,step:0,mode:"read",sel:{},ans:{},r:[],sub:{},help:{},ot:F().day.used>=cap(),t0:Date.now()};render();window.scrollTo({top:0});
+}
+function noraHide(o,a,seed){if(!V.help.nora)return -1;const w=o.map((_,i)=>i).filter(i=>i!==a);return seededShuffle(w,seed)[0];}
+function irisCand(n,pi){const pa=n.paras[pi],others=pa.s.map((_,i)=>i).filter(i=>i!==pa.k);return [pa.k].concat(seededShuffle(others,n.id+pi).slice(0,1)).sort((a,b)=>a-b);}
+function jPassage(n,o){
+  return `<div class="passage jpass ${o.box?"boxed":""}">${n.paras.map((pa,pi)=>`<p class="${o.tp&&o.tp.includes(pi)?"tp":""} ${o.hlP===pi?"hlp":""}"><span class="pnum">¶${pi+1}</span>${pa.s.map((s,si)=>{
+    const can=o.mark&&o.can(pi,si),c=["sent"];
+    if(o.isSel&&o.isSel(pi,si))c.push("sel");if(o.cls){const x=o.cls(pi,si);if(x)c.push(x);}if(o.mark&&!can)c.push("dim");
+    return `<span class="${c.join(" ")}" ${can?`data-act="pickSent" data-p="${pi}" data-s="${si}"`:""}>${o.mark?esc(s):sentHTML(s,pi,si,n.g)}</span>`;}).join(" ")}</p>`).join("")}</div>`;
+}
+function modeBar(){return `<div class="modebar"><button class="${V.mode==="read"?"on":""}" data-act="jMode" data-m="read">📖 閱讀・查單字</button><button class="${V.mode==="mark"?"on":""}" data-act="jMode" data-m="mark">🖍 標記句子</button></div>`;}
+function optBtns(key,o,a,picked,seed,cls){
+  const hid=picked===undefined?noraHide(o,a,seed):-1;
+  return o.map((x,i)=>{if(i===hid)return "";let c="opt"+(cls?" "+cls:"");if(picked!==undefined){if(i===a)c+=" right";else if(i===picked)c+=" wrong";}
+    return `<button class="${c}" data-act="jAns" data-k="${key}" data-o="${i}" ${picked!==undefined?"disabled":""}><span class="L">${"ABCD"[i]}</span><span>${esc(x)}</span></button>`;}).join("");
+}
+function vJob(){
+  const j=findJob(V.jid);if(!j){V={view:"news"};return vFirm();}
+  const n=j.n,K=KINDS[j.kind],steps=jobSteps(j),st=steps[V.step],started=Object.keys(V.sub).length>0||Object.keys(V.ans).length>0,f=F();
+  let h=`<div class="client"><div class="row" style="justify-content:space-between"><b>${j.cl[1]} ${esc(j.cl[0])}</b><span class="chip">${K.i} ${K.n}</span></div><div class="ask">${esc(K.ask(j,n))}</div>
+    <div class="meta-row"><span class="chip red">${LEVELS[n.lv].n}</span><span class="small muted">${DEPTS[j.dept].i} ${DEPTS[j.dept].n}・報酬 $${jobFee(j)}${V.ot?"（加班 ×0.5）":""}</span></div></div>`;
+  const helpers=STAFF.filter(s=>s.k!=="max"&&f.staff.includes(s.k));
+  if(helpers.length&&!started)h+=`<div class="row" style="gap:6px;margin:8px 0">${helpers.map(s=>`<button class="react ${V.help[s.k]?"on":""}" data-act="jHelp" data-h="${s.k}">${V.help[s.k]?"✓ ":""}請 ${s.n} 協助（-15%）</button>`).join("")}</div>`;
+  if(steps.length>1)h+=stepsHTML(steps.map(s=>s==="mark"?"標重點":s==="head"?"結論":"第 "+(+s.slice(1)+1)+" 題"),V.step);
+  if(st==="mark"){
+    const pp=j.pp,sub=V.sub.mark;
+    h+=`<div class="tipbox small">先把情報讀完，再切到 <b>🖍 標記句子</b>，在${pp.map(x=>`第 ${x+1} 段`).join("、")}各點一句最重要的句子。</div>`;
+    if(!sub)h+=modeBar();
+    else h+=`<div class="explain">${pp.map(pi=>{const pa=n.paras[pi],s=V.sel[pi],ok=s===pa.k,half=(pa.a||[]).includes(s);return `<div><b style="color:${ok?"var(--good)":half?"var(--navy)":"var(--bad)"}">第 ${pi+1} 段 ${ok?"✓":half?"△ 也說得通":"✗"}</b>　${esc(pa.w||"")}</div>`;}).join("")}</div><button class="btn wide" data-act="jNext">下一步：給客戶一句話結論 →</button>`;
+    h+=jPassage(n,{mark:!sub&&V.mode==="mark",tp:pp,can:(pi,si)=>pp.includes(pi)&&(!V.help.iris||irisCand(n,pi).includes(si)),isSel:(pi,si)=>V.sel[pi]===si,
+      cls:sub?(pi,si)=>{if(!pp.includes(pi))return "";const pa=n.paras[pi];if(si===pa.k)return "ans";if(V.sel[pi]===si)return (pa.a||[]).includes(si)?"half":"bad";return "";}:null});
+    if(!sub)h+=pp.every(pi=>V.sel[pi]!==undefined)?`<button class="btn wide" data-act="jSubmit">交出重點 →</button>`:`<p class="small muted">還要標：${pp.filter(pi=>V.sel[pi]===undefined).map(x=>`第 ${x+1} 段`).join("、")||"—"}</p>`;
+
+  } else if(st==="head"){
+    const H=n.heads,pk=V.ans.head;
+    h+=`<h3>給客戶的一句話結論</h3><p class="small muted">要抓到全文最重要的判斷：不誇大、不加入情報裡沒有的內容。</p>${optBtns("head",H.o,H.a,pk,n.id+"nh","hd")}`;
+    if(pk!==undefined)h+=`<div class="explain">${esc(H.e||"")}</div><button class="btn wide" data-act="jNext">交件 →</button>`;
+    h+=`<details class="more"><summary>回頭看情報</summary>${jPassage(n,{box:true})}</details>`;
+  } else if(st==="verdict"){
+    const sub=V.sub.verdict,pv=V.ans.v;
+    h+=`<div class="claim">“${esc(j.claim)}”</div>`;
+    if(!sub){h+=`<div class="vbtns">${VERDICTS.map((x,i)=>i===(V.help.nora?noraHide([0,1,2],j.v,j.id):-1)?"":`<button class="opt ${pv===i?"picked":""}" data-act="jVerdict" data-o="${i}"><span>${x}</span></button>`).join("")}</div>`;
+      if(pv!==undefined&&pv!==2)h+=`<div class="tipbox small">切到 <b>🖍 標記句子</b>，點出能證明妳判斷的那一句。${V.help.iris&&j.ev?`Iris：證據在第 ${j.ev[0]+1} 段。`:""}</div>`;
+      h+=modeBar();}
+    if(sub){const ok=pv===j.v;h+=`<div class="explain"><b style="color:${ok?"var(--good)":"var(--bad)"}">${ok?"判斷正確":"正確判斷是："+VERDICTS[j.v]}</b>${j.v!==2&&ok?`　證據句${V.sel.ev&&V.sel.ev[0]===j.ev[0]&&V.sel.ev[1]===j.ev[1]?"也標對了 ✓":"沒標對，綠底那句才是"}`:""}<div style="margin-top:6px">${esc(j.e)}</div></div><button class="btn wide" data-act="jNext">交件 →</button>`;}
+    h+=jPassage(n,{mark:!sub&&V.mode==="mark"&&pv!==undefined&&pv!==2,hlP:V.help.iris&&j.ev?j.ev[0]:null,can:()=>true,isSel:(pi,si)=>V.sel.ev&&V.sel.ev[0]===pi&&V.sel.ev[1]===si,
+      cls:sub?(pi,si)=>{if(j.ev&&j.ev[0]===pi&&j.ev[1]===si)return "ans";if(V.sel.ev&&V.sel.ev[0]===pi&&V.sel.ev[1]===si)return "bad";return "";}:null});
+    if(!sub){const ready=pv!==undefined&&(pv===2||V.sel.ev);h+=ready?`<button class="btn wide" data-act="jSubmit">回覆客戶 →</button>`:`<p class="small muted">${pv===undefined?"先選判斷。":"再標出證據句。"}</p>`;}
+
+  } else if(st&&st[0]==="q"){
+    const qi=+st.slice(1),q=n.q[qi],pk=V.ans["q"+qi];
+    h+=`<div class="small muted">${esc(QTYPE[q.y]||"")}</div><div class="q-text">${esc(q.t)}</div>${optBtns("q"+qi,q.o,q.a,pk,n.id+"q"+qi)}`;
+    if(pk!==undefined)h+=`<div class="explain"><b style="color:${pk===q.a?"var(--good)":"var(--bad)"}">${pk===q.a?"答對了":"正解是 "+"ABCD"[q.a]}</b>　${esc(q.e||"")}</div><button class="btn wide" data-act="jNext">${V.step+1<steps.length?"下一題 →":"交件 →"}</button>`;
+    h+=`<div class="small muted" style="margin-top:12px">情報全文（可捲動、點字查意思）</div>${jPassage(n,{box:true})}`;
+  } else if(st==="ls"){
+    const L=n.ls,A=V.ans,parts=[["subj","主要的主詞是？",L.subj],["verb","主要的動詞是？",L.verb],["mean","整句的意思最接近？",L.mean]];
+    h+=jPassage(n,{box:true,cls:(pi,si)=>pi===L.p&&si===L.s?"tgt":""});
+    h+=`<div class="claim">${esc(n.paras[L.p].s[L.s])}</div>`;
+    parts.forEach(([k,t,Q])=>{h+=`<h3>${t}</h3>${optBtns(k,Q.o,Q.a,A[k],n.id+k)}`;});
+    if(parts.every(([k])=>A[k]!==undefined))h+=`<div class="explain">${esc(L.e||"")}</div><button class="btn wide" data-act="jNext">交件 →</button>`;
+  } else if(st==="pred"){
+    const pr=n.pred,mine=(S.preds||{})[n.id];
+    h+=`<div class="q-text">${esc(pr.q)}</div><p class="small muted">${fmtDue(pr.due)} 前揭曉。報酬到時結算：判斷對了領 1.5 倍，錯了只領 3 成。</p>`;
+    pr.o.forEach((o,i)=>{h+=`<button class="opt ${mine&&mine.o===i?"picked":""}" data-act="jPred" data-o="${i}" ${mine?"disabled":""}><span class="L">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`;});
+    if(pr.hint&&!mine)h+=`<div class="tipbox small"><b>想一想：</b>${esc(pr.hint)}</div>`;
+    if(mine)h+=`<button class="btn wide" data-act="jNext">交件 →</button>`;
+    h+=jPassage(n,{box:true});
+  }
+  h+=sourcesHTML(n);
+  return h;
+}
+function jScoreStep(){
+  const j=findJob(V.jid),n=j.n,st=jobSteps(j)[V.step];
+  if(st==="mark"){let s=0;j.pp.forEach(pi=>{const pa=n.paras[pi],x=V.sel[pi],ok=x===pa.k;recSkill("key",ok);s+=ok?1:(pa.a||[]).includes(x)?.5:0;});V.r[V.step]=s/j.pp.length;V.sub.mark=true;}
+  if(st==="verdict"){const ok=V.ans.v===j.v;recSkill("logic",ok);let s=ok?1:0;
+    if(ok&&j.v!==2){const ev=V.sel.ev&&V.sel.ev[0]===j.ev[0]&&V.sel.ev[1]===j.ev[1];recSkill("key",ev);if(!ev)s=.6;}V.r[V.step]=s;V.sub.verdict=true;}
+}
+function jAnswer(k,o){
+  const j=findJob(V.jid),n=j.n;if(V.ans[k]!==undefined)return;V.ans[k]=o;
+  if(k==="head"){const ok=o===n.heads.a;recSkill("main",ok);V.r[V.step]=ok?1:0;}
+  else if(k[0]==="q"){const qi=+k.slice(1),q=n.q[qi],ok=o===q.a;recSkill(Y2SK[q.y]||"detail",ok);markWrong(n,qi,ok);V.r[V.step]=ok?1:0;}
+  else if(["subj","verb","mean"].includes(k)){recSkill("ls",o===n.ls[k].a);const A=V.ans;if(["subj","verb","mean"].every(x=>A[x]!==undefined))V.r[V.step]=["subj","verb","mean"].filter(x=>A[x]===n.ls[x].a).length/3;}
+  save();
+}
+function finishJob(){
+  const j=findJob(V.jid),n=j.n,f=F(),t=today();
+  const sc=V.r.filter(x=>typeof x==="number"),q=j.kind==="forecast"?null:(sc.length?sc.reduce((a,b)=>a+b,0)/sc.length:0);
+  const hn=(V.help.iris?1:0)+(V.help.nora?1:0),mult=(1-0.15*hn)*(V.ot?0.5:1),base=jobFee(j);
+  let fee=0;
+  if(j.kind==="forecast")f.pend[j.id]={base:Math.round(base*mult),nid:n.id};
+  else fee=Math.round(base*(0.2+0.8*q)*mult);
+  const rb=firmRank().i;f.cash+=fee;f.earned+=fee;
+  const dr=Math.round((q===null?0.5:q)*20);f.rep[j.dept]=(f.rep[j.dept]||0)+dr;
+  f.done[j.id]={q,fee,d:t};f.day.used++;
+  if(!S.days.includes(t))S.days.push(t);
+  const stars=q===null?2:q>=.85?3:q>=.6?2:1,prev=S.done[n.id];S.done[n.id]={best:Math.max(stars,prev?prev.best:0),times:(prev?prev.times:0)+1};
+  const xp=Math.round((q===null?.6:q)*20)+5;S.xp=(S.xp||0)+xp;
+  const before=S.log.length;S.log.push({id:n.id,title:n.title,zh:n.zh||"",topic:n.topic||"",date:t,wpm:null,score:q,stars});
+  const un=OFFICE.find(o=>o[0]===S.log.length&&before<o[0]);
+  const res={q,fee,dr,xp,stars,dept:j.dept,kind:j.kind,promo:firmRank().i>rb?firmRank().name:null,newWords:V.newWords||0};
+  save();V={view:"jobres",jid:j.id,p:n,res};render();window.scrollTo({top:0});
+}
+function vJobRes(){
+  const r=V.res,j=findJob(V.jid);if(!j)return vFirm();
+  const say=r.q===null?"了解，我們等結果出來再說。":r.q>=.85?"太好了，這正是我需要的！":r.q>=.6?"可以用，謝謝。":"嗯……有幾個地方我得再確認一下。";
+  let h=`<div class="card client" style="text-align:center"><div style="font-size:34px">${j.cl[1]}</div><b>${esc(j.cl[0])}</b><div class="ask" style="text-align:center">「${say}」</div>${r.q!==null?starsHTML(r.stars):""}</div>
+  <div class="stats" style="margin-top:12px"><div class="stat"><b>${r.kind==="forecast"?"待結算":"$"+r.fee}</b><span>收入</span></div><div class="stat"><b>+${r.dr}</b><span>${DEPTS[r.dept].n}口碑</span></div><div class="stat"><b>${r.q===null?"—":Math.round(r.q*100)+"%"}</b><span>完成度</span></div><div class="stat"><b>${r.newWords}</b><span>新單字</span></div></div>`;
+  if(r.promo)h+=`<div class="card" style="margin-top:12px;text-align:center"><b>🎉 公司升級為「${r.promo}」！</b></div>`;
+  const f=F(),nextOff=OFFICES.find(o=>!f.offices.includes(o[0])),aff=[nextOff&&f.cash>=nextOff[2]?nextOff[1]:null].concat(STAFF.filter(s=>!f.staff.includes(s.k)&&f.cash>=s.cost).map(s=>"雇用 "+s.n)).filter(Boolean);
+  if(aff.length)h+=`<div class="card small" style="margin-top:12px">現金 $${f.cash.toLocaleString()}，已經可以：${aff.join("、")}。到首頁的「擴張」看看。</div>`;
+  h+=`<button class="btn wide" style="margin-top:14px" data-act="tab" data-v="news">回情報社 →</button>`;
+  return h;
+}
+
 /* ---------- events ---------- */
 document.addEventListener("click",e=>{
   const el=e.target.closest("[data-act]");if(!el)return;
@@ -1081,6 +1322,17 @@ document.addEventListener("click",e=>{
   const d=el.dataset;
   switch(d.act){
     case "tab": go(d.v);break;
+    case "takeJob": takeJob(d.j);break;
+    case "jMode": V.mode=d.m;render();break;
+    case "jHelp": V.help[d.h]=!V.help[d.h];render();break;
+    case "pickSent": {const j=findJob(V.jid);if(!j)break;if(j.kind==="verify")V.sel.ev=[+d.p,+d.s];else V.sel[+d.p]=+d.s;render();break;}
+    case "jVerdict": V.ans.v=+d.o;if(V.ans.v===2)V.sel.ev=null;else if(V.mode!=="mark")V.mode="mark";render();break;
+    case "jSubmit": jScoreStep();save();render();break;
+    case "jAns": jAnswer(d.k,+d.o);render();break;
+    case "jPred": {S.preds=S.preds||{};if(!S.preds[V.p.id]){S.preds[V.p.id]={o:+d.o,d:today()};save();}render();break;}
+    case "jNext": {const j=findJob(V.jid);if(V.step+1<jobSteps(j).length){V.step++;V.mode="read";render();window.scrollTo({top:0});}else finishJob();break;}
+    case "buyOffice": {const f=F(),o=OFFICES.find(x=>!f.offices.includes(x[0]));if(o&&f.cash>=o[2]){f.cash-=o[2];f.offices.push(o[0]);save();toast(`${o[1]}開張了！每天多一個工時`);render();}break;}
+    case "hire": {const f=F(),s=STAFF.find(x=>x.k===d.k);if(s&&!f.staff.includes(s.k)&&f.cash>=s.cost){f.cash-=s.cost;f.staff.push(s.k);save();toast(`${s.n} 加入團隊了！`);render();}break;}
     case "openNews": openNews(findP(d.id));break;
     case "openDesk": openDesk(findP(d.id));break;
     case "titleTap": titleTap();break;

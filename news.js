@@ -9,6 +9,8 @@ window.RES = [
 window.NEWS = [
 /*NEW*/
 {id:"o20261115-asean",desk:true,top:true,date:"2026-11-15",slug:"ASEAN-MYANMAR",zh:"東協馬尼拉峰會，緬甸領導人仍被拒於門外",place:"Manila, Philippines",topic:"國際・外交",lv:3,
+ claims:[{c:"Several ASEAN members have received Myanmar’s leader on official visits.",v:0,ev:[2,1],e:"第 3 段第二句：泰國、寮國、馬來西亞都曾正式接待他。情報支持這個說法。"},
+  {c:"The Philippines intends to readmit Myanmar’s leaders to ASEAN meetings next year.",v:2,e:"情報只說今年峰會維持禁令，完全沒提明年的打算。聽起來合理但找不到原句，就是「沒有提到」。這是 GRE 和查證最常見的陷阱。"}],
  pred:{q:"東協峰會（11/15–17）結束後，正式文件對緬甸軍方領導人的處理會是？",o:["維持排除，也不承認選舉結果","邀請敏昂萊出席之後的峰會","宣布暫停緬甸的會籍"],due:"2026-11-19",hint:"看第 2、4 段：五年來的慣例是什麼？主席國這週剛說了什麼？有哪些國家態度不同？"},
  ls:{p:1,s:2,subj:{o:["What makes this year’s snub more salient","Min Aung Hlaing","the coup leader","critics"],a:0},verb:{o:["makes","is","has been installed","had hoped"],a:1},mean:{o:["敏昂萊今年讓峰會變得更受矚目，因為他批評了選舉。","今年被冷落之所以更引人注目，是因為政變領袖敏昂萊在一場被批評者普遍斥為假選舉的投票後當上總統，他原本希望新頭銜能替他換來一些正當性。","批評者希望敏昂萊在選舉後放棄總統頭銜。","敏昂萊認為今年的峰會比往年更重要，所以想出席。"],a:1},e:"主詞是整個名詞子句 What makes this year’s snub more salient（讓今年的冷落更顯眼的事），主要動詞是 is。後面 that… 是補語，說明「是什麼」；after elections that… 和 and he had hoped… 都在補語裡面。GRE 很愛用 What 開頭的名詞子句當主詞。"},
  sources:[{name:"The Irrawaddy",url:"https://www.irrawaddy.com/?p=156488"},{name:"New Straits Times (Bernama)",url:"https://www.nst.com.my/amp/world/region/2026/11/1572657/asean-summit-highlights-philippines-leadership-readiness-new"},{name:"Arab News",url:"https://www.arabnews.pk/world/myanmar-complains-over-pariah-treatment-in-asean-bloc-2643097"},{name:"ABC News (Australia)",url:"https://www.abc.net.au/news/2026-11-13/trump-quest-for-rare-earths-brings-us-closer-to-myanmar-regime/107376926"}],
@@ -35,6 +37,9 @@ window.NEWS = [
   {y:"attitude",t:"The author’s attitude toward the argument for engagement is best described as",o:["sceptical","enthusiastic","indifferent","openly hostile toward ASEAN"],a:0,e:"作者用 Yet… presupposes… hard to sustain 反駁，並舉空襲加劇為證，是保留、懷疑的態度，但沒有攻擊東協本身。"}
  ]},
 {id:"o20261115-measles-status",desk:true,date:"2026-11-15",slug:"MEASLES-VERDICT",zh:"美國等待麻疹根除地位裁定",place:"Washington, USA",topic:"公衛・國際",lv:3,
+ claims:[{c:"Measles infections in the US this year are more than double the 2025 level.",v:0,ev:[1,3],e:"第 2 段最後一句：Infections have more than doubled this year compared with 2025。情報支持。"},
+  {c:"CDC officials say they will overhaul their vaccination strategy if the status is lost.",v:1,ev:[3,0],e:"第 4 段第一句：CDC 堅稱即使結果不利也不會改變策略，仍以 MMR 疫苗為主。和這個說法相反。"},
+  {c:"Canada is expected to regain its measles-elimination status next year.",v:2,e:"情報只提到加拿大最近失去地位，沒有說何時能恢復。"}],
  pred:{q:"11/25 前，PAHO 公開的結果會是？",o:["美國失去麻疹根除地位","美國保住根除地位","到時還沒有公開結果"],due:"2026-11-25",hint:"看第 2 段：判定標準是什麼？目前的證據指向哪一邊？第 1 段說結果預計什麼時候公布？"},
  ls:{p:1,s:2,subj:{o:["One prominent adviser","the American report","an outbreak in Arizona and Utah","public data"],a:0},verb:{o:["presented","said","began","meets"],a:1},mean:{o:["一位知名顧問在亞利桑那和猶他州爆發疫情後，向委員會提交了美國的報告。","向委員會提交美國報告的一位知名顧問表示，單從公開資料判斷，2025 年 6 月在亞利桑那和猶他州開始、至今仍持續的疫情，很可能已經達到門檻。","公開資料顯示，亞利桑那和猶他州的疫情在 2025 年 6 月已經結束。","委員會的顧問認為美國的報告不符合門檻。"],a:1},e:"主幹是 One prominent adviser … said that …。who presented… 修飾 adviser；that 子句裡又有自己的主詞 an outbreak（被 which began… 修飾）和動詞 meets；judging from… 是補充依據。"},
  sources:[{name:"Reuters via News Tribune",url:"https://www.newstribune.com/news/2026/nov/11/us-faces-loss-of-measles-free-status-as-experts-meet-for-review/"},{name:"PAHO",url:"https://www.paho.org/en/news/2-3-2026-update-review-measles-elimination-status"}],
